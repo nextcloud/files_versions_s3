@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<info>
+	<id>files_versions_s3</id>
+	<name>S3 Versioning</name>
+	<summary>Use S3 object versioning for file versioning</summary>
+	<description><![CDATA[Use S3 object versioning for file versioning.]]></description>
+	<version>0.1.0</version>
+	<licence>agpl</licence>
+	<author>Robin Appelman</author>
+	<namespace>FilesVersionsS3</namespace>
+	<types>
+		<filesystem/>
+	</types>
+
+	<category>files</category>
+
+	<website>https://github.com/icewind1991/files_versions_s3</website>
+	<bugs>https://github.com/icewind1991/files_versions_s3/issues</bugs>
+	<repository type="git">https://github.com/icewind1991/files_versions_s3.git</repository>
+
+	<dependencies>
+		<nextcloud min-version="17" max-version="17" />
+	</dependencies>
+
+	<settings>
+		<admin>OCA\FilesVersionsS3\Settings\Admin</admin>
+		<admin-section>OCA\FilesVersionsS3\Settings\Section</admin-section>
+	</settings>
+
+	<versions>
+		<backend for="OC\Files\ObjectStore\ObjectStoreStorage">OCA\FilesVersionsS3\Versions\PrimaryS3VersionsBackend</backend>
+		<backend for="OCA\Files_External\Lib\Storage\AmazonS3">OCA\FilesVersionsS3\Versions\ExternalS3VersionsBackend</backend>
+	</versions>
+</info>
