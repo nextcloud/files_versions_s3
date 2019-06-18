@@ -31,4 +31,9 @@
 		<backend for="OC\Files\ObjectStore\ObjectStoreStorage">OCA\FilesVersionsS3\Versions\PrimaryS3VersionsBackend</backend>
 		<backend for="OCA\Files_External\Lib\Storage\AmazonS3">OCA\FilesVersionsS3\Versions\ExternalS3VersionsBackend</backend>
 	</versions>
+
+	<commands>
+		<command>OCA\FilesVersionsS3\Command\Status</command>
+		<command>OCA\FilesVersionsS3\Command\Enable</command>
+	</commands>
 </info>
