@@ -45,10 +45,12 @@ abstract class AbstractS3VersionBackend implements IVersionBackend {
 	 */
 	abstract protected function getS3(FileInfo $file);
 
+	abstract protected function getUrn(FileInfo $file): string;
+
 	public function getVersionsForFile(IUser $user, FileInfo $file): array {
 		$s3 = $this->getS3($file);
 		if ($s3) {
-			return $this->versionProvider->getVersions($s3, $file->getInternalPath(), $user, $file, $this);
+			return $this->versionProvider->getVersions($s3, $this->getUrn($file), $user, $file, $this);
 		}
 
 		return [];
@@ -62,7 +64,7 @@ abstract class AbstractS3VersionBackend implements IVersionBackend {
 		$source = $version->getSourceFile();
 		$s3 = $this->getS3($source);
 		if ($s3) {
-			$this->versionProvider->rollback($s3, $version->getSourceFile()->getInternalPath(), $version->getRevisionId());
+			$this->versionProvider->rollback($s3, $this->getUrn($version->getSourceFile()), $version->getRevisionId());
 			return true;
 		}
 
@@ -73,7 +75,7 @@ abstract class AbstractS3VersionBackend implements IVersionBackend {
 		$source = $version->getSourceFile();
 		$s3 = $this->getS3($source);
 		if ($s3) {
-			return $this->versionProvider->read($s3, $version->getSourceFile()->getInternalPath(), $version->getRevisionId());
+			return $this->versionProvider->read($s3, $this->getUrn($version->getSourceFile()), $version->getRevisionId());
 		}
 
 
@@ -84,7 +86,7 @@ abstract class AbstractS3VersionBackend implements IVersionBackend {
 		$s3 = $this->getS3($sourceFile);
 		if ($s3) {
 			return new S3PreviewFile($sourceFile, function() use ($s3, $sourceFile, $revision) {
-				return $this->versionProvider->read($s3, $sourceFile->getInternalPath(), $revision);
+				return $this->versionProvider->read($s3, $this->getUrn($sourceFile->getInternalPath()), $revision);
 			}, $revision);
 		}
 	}

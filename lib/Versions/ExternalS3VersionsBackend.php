@@ -43,4 +43,8 @@ class ExternalS3VersionsBackend extends AbstractS3VersionBackend {
 			return null;
 		}
 	}
+
+	protected function getUrn(FileInfo $file): string {
+		return $file->getInternalPath();
+	}
 }

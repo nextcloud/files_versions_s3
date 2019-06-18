@@ -45,6 +45,9 @@ class S3VersionProvider {
 			'Bucket' => $objectStore->getBucket(),
 			'Prefix' => $urn
 		]);
+		\OC::$server->getLogger()->error(json_encode($result));
+		\OC::$server->getLogger()->error($objectStore->getBucket());
+		\OC::$server->getLogger()->error($urn);
 		$s3versions = array_values(array_filter($result['Versions'], function (array $version) {
 			return !$version['IsLatest'];
 		}));

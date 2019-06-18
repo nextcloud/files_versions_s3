@@ -54,4 +54,10 @@ class PrimaryS3VersionsBackend extends AbstractS3VersionBackend {
 
 		return null;
 	}
+
+	protected function getUrn(FileInfo $file): string {
+		/** @var ObjectStoreStorage $storage */
+		$storage = $file->getStorage();
+		return $storage->getURN($file->getId());
+	}
 }
