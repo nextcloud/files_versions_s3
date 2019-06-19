@@ -86,7 +86,7 @@ abstract class AbstractS3VersionBackend implements IVersionBackend {
 		$s3 = $this->getS3($sourceFile);
 		if ($s3) {
 			return new S3PreviewFile($sourceFile, function() use ($s3, $sourceFile, $revision) {
-				return $this->versionProvider->read($s3, $this->getUrn($sourceFile->getInternalPath()), $revision);
+				return $this->versionProvider->read($s3, $this->getUrn($sourceFile), $revision);
 			}, $revision);
 		}
 	}
