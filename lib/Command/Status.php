@@ -47,7 +47,7 @@ class Status extends Base {
 		$status = [];
 
 		foreach ($configs as $config) {
-			$status[$config->getId()] = $config->versioningEnabled();
+			$status[$config->getId() . ' '] = $config->versioningEnabled();
 		}
 
 		$this->writeArrayInOutputFormat($input, $output, $status);

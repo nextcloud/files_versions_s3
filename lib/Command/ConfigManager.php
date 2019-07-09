@@ -57,7 +57,7 @@ class ConfigManager {
 			$storages = array_map(function (StorageConfig $config) {
 				$storageClass = $config->getBackend()->getStorageClass();
 				/** @var \OCA\Files_External\Lib\Storage\AmazonS3 $storage */
-				$storage = $storageClass($config->getBackendOptions());
+				$storage = new $storageClass($config->getBackendOptions());
 				return new S3Config((string)$config->getId(), $storage->getConnection(), $storage->getBucket());
 			}, $s3StorageConfigs);
 		} else {
