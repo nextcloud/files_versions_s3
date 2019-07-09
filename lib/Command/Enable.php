@@ -52,7 +52,7 @@ class Enable extends Base {
 		$config = null;
 
 		foreach ($configs as $config) {
-			if ($config->getId() == $id) {
+			if ($config->getId() === $id) {
 				$config->enableVersioning();
 				return 0;
 			}

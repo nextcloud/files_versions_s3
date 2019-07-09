@@ -3,7 +3,19 @@
 	<id>files_versions_s3</id>
 	<name>S3 Versioning</name>
 	<summary>Use S3 object versioning for file versioning</summary>
-	<description><![CDATA[Use S3 object versioning for file versioning.]]></description>
+	<description><![CDATA[Use S3 object versioning for file versioning.
+
+## Warning
+
+This app does not include any mechanism for expiring old s3 versions,
+you should setup your own version expiry (also called "Lifecycle management" in S3)
+to prevent versions from taking up an ever increasing amount of space.
+
+## Usage
+
+- install the app
+- check if bucket versioning is enabled for your storage using `occ files_versions_s3:status`
+- enable bucket versioning if not yet enabled using `occ files_versions_s3:enable <id>`]]></description>
 	<version>0.1.0</version>
 	<licence>agpl</licence>
 	<author>Robin Appelman</author>
@@ -22,6 +34,11 @@
 		<nextcloud min-version="17" max-version="17" />
 	</dependencies>
 
+	<commands>
+		<command>OCA\FilesVersionsS3\Command\Status</command>
+		<command>OCA\FilesVersionsS3\Command\Enable</command>
+	</commands>
+
 	<settings>
 		<admin>OCA\FilesVersionsS3\Settings\Admin</admin>
 		<admin-section>OCA\FilesVersionsS3\Settings\Section</admin-section>
@@ -31,9 +48,4 @@
 		<backend for="OC\Files\ObjectStore\ObjectStoreStorage">OCA\FilesVersionsS3\Versions\PrimaryS3VersionsBackend</backend>
 		<backend for="OCA\Files_External\Lib\Storage\AmazonS3">OCA\FilesVersionsS3\Versions\ExternalS3VersionsBackend</backend>
 	</versions>
-
-	<commands>
-		<command>OCA\FilesVersionsS3\Command\Status</command>
-		<command>OCA\FilesVersionsS3\Command\Enable</command>
-	</commands>
 </info>
