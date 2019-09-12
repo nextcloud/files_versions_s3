@@ -39,11 +39,6 @@ to prevent versions from taking up an ever increasing amount of space.
 		<command>OCA\FilesVersionsS3\Command\Enable</command>
 	</commands>
 
-	<settings>
-		<admin>OCA\FilesVersionsS3\Settings\Admin</admin>
-		<admin-section>OCA\FilesVersionsS3\Settings\Section</admin-section>
-	</settings>
-
 	<versions>
 		<backend for="OC\Files\ObjectStore\ObjectStoreStorage">OCA\FilesVersionsS3\Versions\PrimaryS3VersionsBackend</backend>
 		<backend for="OCA\Files_External\Lib\Storage\AmazonS3">OCA\FilesVersionsS3\Versions\ExternalS3VersionsBackend</backend>
