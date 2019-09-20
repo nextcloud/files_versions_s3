@@ -46,8 +46,19 @@ class Status extends Base {
 
 		$status = [];
 
-		foreach ($configs as $config) {
-			$status[$config->getId() . ' '] = $config->versioningEnabled();
+		$outputFormat = $input->getOption('output');
+		if ($outputFormat == Base::OUTPUT_FORMAT_JSON || $outputFormat == Base::OUTPUT_FORMAT_JSON_PRETTY) {
+			foreach ($configs as $config) {
+				$status[$config->getId()] = [
+					'id' => $config->getId(),
+					'name' => $config->getName(),
+					'enabled' => $config->versioningEnabled(),
+				];
+			}
+		} else {
+			foreach ($configs as $config) {
+				$status[$config->getId() . ' ("' . $config->getName() . '")'] = $config->versioningEnabled();
+			}
 		}
 
 		$this->writeArrayInOutputFormat($input, $output, $status);

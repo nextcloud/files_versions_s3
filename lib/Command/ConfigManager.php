@@ -58,7 +58,7 @@ class ConfigManager {
 				$storageClass = $config->getBackend()->getStorageClass();
 				/** @var \OCA\Files_External\Lib\Storage\AmazonS3 $storage */
 				$storage = new $storageClass($config->getBackendOptions());
-				return new S3Config((string)$config->getId(), $storage->getConnection(), $storage->getBucket());
+				return new S3Config((string)$config->getId(), $storage->getConnection(), $storage->getBucket(), $config->getMountPoint());
 			}, $s3StorageConfigs);
 		} else {
 			$storages = [];
@@ -69,7 +69,7 @@ class ConfigManager {
 		if ($primaryStorage->instanceOfStorage(ObjectStoreStorage::class) and $primaryStorage->getObjectStore() instanceof S3) {
 			/** @var S3 $s3 */
 			$s3 = $primaryStorage->getObjectStore();
-			$storages[] = new S3Config('primary', $s3->getConnection(), $s3->getBucket());
+			$storages[] = new S3Config('primary', $s3->getConnection(), $s3->getBucket(), "Primary Storage");
 		}
 
 		return $storages;

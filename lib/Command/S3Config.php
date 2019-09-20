@@ -27,11 +27,13 @@ class S3Config {
 	private $id;
 	private $s3;
 	private $bucket;
+	private $name;
 
-	public function __construct(string $id, S3Client $s3, string $bucket) {
+	public function __construct(string $id, S3Client $s3, string $bucket, string $name) {
 		$this->id = $id;
 		$this->s3 = $s3;
 		$this->bucket = $bucket;
+		$this->name = $name;
 	}
 
 	public function getId(): string {
@@ -44,6 +46,10 @@ class S3Config {
 
 	public function getBucket(): string {
 		return $this->bucket;
+	}
+
+	public function getName(): string {
+		return $this->name;
 	}
 
 	public function versioningEnabled(): bool  {
