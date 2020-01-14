@@ -52,6 +52,10 @@ class S3Config {
 		return $this->name;
 	}
 
+	public function getConnection(): S3Client {
+		return $this->getS3();
+	}
+
 	public function versioningEnabled(): bool  {
 		$result = $this->getS3()->getBucketVersioning(['Bucket' => $this->getBucket()]);
 		return $result->get('Status') === 'Enabled';
