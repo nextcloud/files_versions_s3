@@ -11,13 +11,19 @@ version+=0.1.1
 
 all: appstore
 
+node_modules: package.json
+	npm install
+
+CHANGELOG.md: node_modules
+	node_modules/.bin/changelog
+
 clean:
 	rm -rf $(sign_dir)
 	rm -rf $(build_dir)
 
 release: appstore
 
-appstore: clean
+appstore: clean CHANGELOG.md
 	mkdir -p $(sign_dir)
 	rsync -a \
 	--exclude=/docs \
