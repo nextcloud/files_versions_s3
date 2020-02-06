@@ -22,6 +22,7 @@
 namespace OCA\FilesVersionsS3\Versions;
 
 use Aws\Api\DateTimeResult;
+use Aws\S3\S3Client;
 use OC\Files\ObjectStore\S3ConnectionTrait;
 use OCA\Files_Versions\Versions\IVersion;
 use OCA\Files_Versions\Versions\IVersionBackend;
@@ -43,7 +44,7 @@ class S3VersionProvider {
 	public function getVersions($objectStore, string $urn, IUser $user, FileInfo $sourceFile, IVersionBackend $backend) {
 		$result = $objectStore->getConnection()->listObjectVersions([
 			'Bucket' => $objectStore->getBucket(),
-			'Prefix' => $urn
+			'Prefix' => $urn,
 		]);
 		$s3versions = array_values(array_filter($result['Versions'], function (array $version) {
 			return !$version['IsLatest'];
@@ -81,8 +82,8 @@ class S3VersionProvider {
 
 		$client->copyObject([
 			'Bucket' => $bucket,
-			'CopySource' => urlencode($bucket . '/' . $urn) . '?versionId=' . $versionId,
-			'Key' => $urn
+			'CopySource' => S3Client::encodeKey($bucket . '/' . $urn) . '?versionId=' . urlencode($versionId),
+			'Key' => $urn,
 		]);
 	}
 
@@ -98,7 +99,7 @@ class S3VersionProvider {
 		$command = $client->getCommand('GetObject', [
 			'Bucket' => $objectStore->getBucket(),
 			'Key' => $urn,
-			'VersionId' => $versionId
+			'VersionId' => $versionId,
 		]);
 		$request = \Aws\serialize($command);
 		$headers = [];
@@ -109,8 +110,8 @@ class S3VersionProvider {
 		}
 		$opts = [
 			'http' => [
-				'header' => $headers
-			]
+				'header' => $headers,
+			],
 		];
 
 		$context = stream_context_create($opts);
