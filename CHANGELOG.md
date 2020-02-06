@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.1.2
+- Fix reverting versions with some S3 implementations
+
 ## v0.1.1
 - Compatible with Nextcloud 18
 

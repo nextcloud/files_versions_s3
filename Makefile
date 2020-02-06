@@ -16,6 +16,8 @@ node_modules: package.json
 CHANGELOG.md: node_modules
 	node_modules/.bin/changelog
 
+.PHONY: CHANGELOG.md
+
 clean:
 	rm -rf $(sign_dir)
 	rm -rf $(build_dir)
