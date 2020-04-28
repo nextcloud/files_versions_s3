@@ -21,7 +21,7 @@ before_install:
 
 install:
   - docker pull localstack/localstack
-  - docker run -d -p 4569:4569 -e SERVICES=s3:4569 localstack/localstack
+  - docker run -d -p 4569:4569 -e SERVICES=s3:4569 localstack/localstack:0.10.9
   - sleep 2
   - echo "<?php \$CONFIG=['objectstore' => ['class' => 'OC\Files\ObjectStore\S3','arguments' => ['bucket' => 'nextcloud','autocreate' => true,'key' => 'dummy','secret' => 'dummyj','hostname' => 'localhost','port' => 4569,'use_ssl' => false,'use_path_style'=>true]]];" > nextcloud/config/config.php
   - cat nextcloud/config/config.php
