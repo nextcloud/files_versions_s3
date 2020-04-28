@@ -52,3 +52,5 @@ appstore: clean CHANGELOG.md
 		openssl dgst -sha512 -sign $(cert_dir)/$(app_name).key $(build_dir)/$(app_name).tar.gz | openssl base64; \
 	fi
 
+sign: $(build_dir)/$(app_name).tar.gz
+	openssl dgst -sha512 -sign $(cert_dir)/$(app_name).key $(build_dir)/$(app_name).tar.gz | openssl base64;

@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.3
+- Fix "S3PreviewFile" log message
+- Release with new certificate due to https://github.com/nextcloud/app-certificate-requests/pull/265#issuecomment-620394763
+- Mark as compatible with the upcoming Nextcloud 19
+
 ## v0.1.2
 - Fix reverting versions with some S3 implementations
 
