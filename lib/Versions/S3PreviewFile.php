@@ -196,5 +196,11 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 		// noop
 	}
 
+	public function getCreationTime(): int {
+		return 0;
+	}
 
+	public function getUploadTime(): int {
+		return 0;
+	}
 }
