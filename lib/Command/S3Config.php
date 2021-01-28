@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2019 Robin Appelman <robin@icewind.nl>
  *
@@ -56,7 +58,7 @@ class S3Config {
 		return $this->getS3();
 	}
 
-	public function versioningEnabled(): bool  {
+	public function versioningEnabled(): bool {
 		$result = $this->getS3()->getBucketVersioning(['Bucket' => $this->getBucket()]);
 		return $result->get('Status') === 'Enabled';
 	}

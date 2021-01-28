@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * @copyright Copyright (c) 2019 Robin Appelman <robin@icewind.nl>
  *
@@ -20,7 +22,6 @@
  */
 
 namespace OCA\FilesVersionsS3\Versions;
-
 
 use OC\Files\ObjectStore\S3ConnectionTrait;
 use OCA\Files_Versions\Versions\IVersion;
@@ -85,7 +86,7 @@ abstract class AbstractS3VersionBackend implements IVersionBackend {
 	public function getVersionFile(IUser $user, FileInfo $sourceFile, $revision): File {
 		$s3 = $this->getS3($sourceFile);
 		if ($s3) {
-			return new S3PreviewFile($sourceFile, function() use ($s3, $sourceFile, $revision) {
+			return new S3PreviewFile($sourceFile, function () use ($s3, $sourceFile, $revision) {
 				return $this->versionProvider->read($s3, $this->getUrn($sourceFile), $revision);
 			}, $revision);
 		}
