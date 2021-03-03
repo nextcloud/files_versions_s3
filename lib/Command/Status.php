@@ -59,7 +59,11 @@ class Status extends Base {
 			}
 		} else {
 			foreach ($configs as $config) {
-				$status[$config->getId() . ' ("' . $config->getName() . '")'] = $config->versioningEnabled();
+				if ($config instanceof BrokenConfig) {
+					$status[$config->getId() . ' ("' . $config->getName() . '")'] = "<error>" . $config->getException()->getMessage() . "</error>";
+				} elseif ($config instanceof S3Config) {
+					$status[$config->getId() . ' ("' . $config->getName() . '")'] = $config->versioningEnabled();
+				}
 			}
 		}
 

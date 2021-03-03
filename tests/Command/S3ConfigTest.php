@@ -38,6 +38,9 @@ class S3ConfigTest extends TestCase {
 		/** @var ConfigManager $configManager */
 		$configManager = \OC::$server->query(ConfigManager::class);
 		$configs = $configManager->getS3Configs();
+		$configs = array_filter($configs, function ($config) {
+			return $config instanceof S3Config;
+		});
 
 		if (!$configs) {
 			$this->markTestSkipped("No S3 configured");

@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace OCA\FilesVersionsS3\Command;
 
+use Exception;
 use OC\Files\ObjectStore\ObjectStoreStorage;
 use OC\Files\ObjectStore\S3;
 use OCA\Files_External\Lib\Backend\AmazonS3;
@@ -47,7 +48,7 @@ class ConfigManager {
 	}
 
 	/**
-	 * @return S3Config[]
+	 * @return (S3Config|BrokenConfig)[]
 	 */
 	public function getS3Configs() {
 		if ($this->globalService) {
@@ -57,9 +58,13 @@ class ConfigManager {
 			});
 			$storages = array_map(function (StorageConfig $config) {
 				$storageClass = $config->getBackend()->getStorageClass();
-				/** @var \OCA\Files_External\Lib\Storage\AmazonS3 $storage */
-				$storage = new $storageClass($config->getBackendOptions());
-				return new S3Config((string)$config->getId(), $storage->getConnection(), $storage->getBucket(), $config->getMountPoint());
+				try {
+					/** @var \OCA\Files_External\Lib\Storage\AmazonS3 $storage */
+					$storage = new $storageClass($config->getBackendOptions());
+					return new S3Config((string)$config->getId(), $storage->getConnection(), $storage->getBucket(), $config->getMountPoint());
+				} catch (Exception $e) {
+					return new BrokenConfig((string)$config->getId(), $storage->getBucket(), $config->getMountPoint(), $e);
+				}
 			}, $s3StorageConfigs);
 		} else {
 			$storages = [];

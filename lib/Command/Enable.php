@@ -54,6 +54,11 @@ class Enable extends Base {
 
 		foreach ($configs as $config) {
 			if ($config->getId() === $id) {
+				if ($config instanceof BrokenConfig) {
+					$output->writeln("<error>S3 configuration is invalid</error>");
+					$output->writeln("<error>" . $config->getException()->getMessage() . "</error>");
+					return 1;
+				}
 				$config->enableVersioning();
 				return 0;
 			}
