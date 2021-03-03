@@ -24,7 +24,7 @@ jobs:
         ports:
           - 4569:4569
         env:
-          SERVICES=s3:4569
+          SERVICES: s3:4569
 
     steps:
       - name: Checkout server
