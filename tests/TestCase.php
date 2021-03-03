@@ -25,7 +25,7 @@ namespace OCA\FilesVersionsS3\Tests;
 
 use OCP\IDBConnection;
 
-class TestCase extends \Test\TestCase {
+abstract class TestCase extends \Test\TestCase {
 	public static function tearDownAfterClass(): void {
 		if (self::$realDatabase !== null) {
 			// in case an error is thrown in a test, PHPUnit jumps straight to tearDownAfterClass,

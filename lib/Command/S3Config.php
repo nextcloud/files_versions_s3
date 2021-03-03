@@ -65,7 +65,7 @@ class S3Config {
 
 	public function enableVersioning() {
 		$this->getS3()->putBucketVersioning([
-			'Bucket' => $this->getBucket(),
+			'Bucket'                  => $this->getBucket(),
 			'VersioningConfiguration' => [
 				'Status' => 'Enabled',
 			],

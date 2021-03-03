@@ -52,8 +52,8 @@ class Status extends Base {
 		if ($outputFormat == Base::OUTPUT_FORMAT_JSON || $outputFormat == Base::OUTPUT_FORMAT_JSON_PRETTY) {
 			foreach ($configs as $config) {
 				$status[$config->getId()] = [
-					'id' => $config->getId(),
-					'name' => $config->getName(),
+					'id'      => $config->getId(),
+					'name'    => $config->getName(),
 					'enabled' => $config->versioningEnabled(),
 				];
 			}

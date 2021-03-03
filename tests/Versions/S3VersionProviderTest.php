@@ -76,8 +76,13 @@ class S3VersionProviderTest extends TestCase {
 		// delay to make sure we have distinct timestamps for sorting
 		sleep(1);
 
-		$this->assertEmpty($this->versionProvider->getVersions($this->config, 'foo', $this->user, $sourceFile,
-			$this->backend));
+		$this->assertEmpty($this->versionProvider->getVersions(
+			$this->config,
+			'foo',
+			$this->user,
+			$sourceFile,
+			$this->backend
+		));
 
 		$this->config->getS3()->upload($this->config->getBucket(), 'foo', 'foo');
 
@@ -107,10 +112,14 @@ class S3VersionProviderTest extends TestCase {
 		$this->assertCount(2, $versions);
 
 
-		$this->assertEquals('bar',
-			stream_get_contents($this->versionProvider->read($this->config, "bar", $versions[1]->getRevisionId())));
-		$this->assertEquals('foo',
-			stream_get_contents($this->versionProvider->read($this->config, "bar", $versions[0]->getRevisionId())));
+		$this->assertEquals(
+			'bar',
+			stream_get_contents($this->versionProvider->read($this->config, "bar", $versions[1]->getRevisionId()))
+		);
+		$this->assertEquals(
+			'foo',
+			stream_get_contents($this->versionProvider->read($this->config, "bar", $versions[0]->getRevisionId()))
+		);
 	}
 
 	public function testRollback() {
@@ -121,19 +130,29 @@ class S3VersionProviderTest extends TestCase {
 		$this->config->getS3()->upload($this->config->getBucket(), 'rollback', 'bar');
 		$this->config->getS3()->upload($this->config->getBucket(), 'rollback', 'foo');
 		$this->config->getS3()->upload($this->config->getBucket(), 'rollback', 'asd');
-		$versions = $this->versionProvider->getVersions($this->config, 'rollback', $this->user, $sourceFile,
-			$this->backend);
+		$versions = $this->versionProvider->getVersions(
+			$this->config,
+			'rollback',
+			$this->user,
+			$sourceFile,
+			$this->backend
+		);
 
 		$this->versionProvider->rollback($this->config, "rollback", $versions[1]->getRevisionId());
 
-		$versions = $this->versionProvider->getVersions($this->config, 'rollback', $this->user, $sourceFile,
-			$this->backend);
+		$versions = $this->versionProvider->getVersions(
+			$this->config,
+			'rollback',
+			$this->user,
+			$sourceFile,
+			$this->backend
+		);
 		$this->assertCount(3, $versions);
 
 
 		$this->assertEquals('foo', (string)$this->config->getS3()->getObject([
 			'Bucket' => $this->config->getBucket(),
-			'Key' => "rollback",
+			'Key'    => "rollback",
 		])['Body']);
 	}
 }
