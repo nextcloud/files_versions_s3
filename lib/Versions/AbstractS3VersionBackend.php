@@ -90,5 +90,6 @@ abstract class AbstractS3VersionBackend implements IVersionBackend {
 				return $this->versionProvider->read($s3, $this->getUrn($sourceFile), $revision);
 			}, $revision);
 		}
+		throw new \Exception("Requested s3 version for a file not stored in s3");
 	}
 }

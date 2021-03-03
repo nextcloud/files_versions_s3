@@ -1,41 +1,290 @@
 <?php
-//
-//declare(strict_types=1);
-///**
-// * @copyright Copyright (c) 2021 Robin Appelman <robin@icewind.nl>
-// *
-// * @license GNU AGPL version 3 or any later version
-// *
-// * This program is free software: you can redistribute it and/or modify
-// * it under the terms of the GNU Affero General Public License as
-// * published by the Free Software Foundation, either version 3 of the
-// * License, or (at your option) any later version.
-// *
-// * This program is distributed in the hope that it will be useful,
-// * but WITHOUT ANY WARRANTY; without even the implied warranty of
-// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// * GNU Affero General Public License for more details.
-// *
-// * You should have received a copy of the GNU Affero General Public License
-// * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-// *
-// */
-//
-//namespace OC\Core\Command {
-//	use Symfony\Component\Console\Command\Command;
-//
-//	class Base  extends Command {
-//	}
-//}
-//
-//namespace {
-//	class OC_Helper {
-//		public static function computerFileSize(string $size): int {
-//			throw new \Exception('stub');
-//		}
-//
-//		public static function humanFileSize(int $size): string {
-//			throw new \Exception('stub');
-//		}
-//	}
-//}
+
+declare(strict_types=1);
+/**
+ * @copyright Copyright (c) 2021 Robin Appelman <robin@icewind.nl>
+ *
+ * @license GNU AGPL version 3 or any later version
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+namespace OC\Core\Command {
+	use Symfony\Component\Console\Command\Command;
+	use Symfony\Component\Console\Input\InputInterface;
+	use Symfony\Component\Console\Output\OutputInterface;
+
+	class Base extends Command {
+		public const OUTPUT_FORMAT_PLAIN = 'plain';
+		public const OUTPUT_FORMAT_JSON = 'json';
+		public const OUTPUT_FORMAT_JSON_PRETTY = 'json_pretty';
+
+		protected function writeArrayInOutputFormat(InputInterface $input, OutputInterface $output, $items, $prefix = '  - ') {
+		}
+	}
+}
+
+namespace OCA\Files_External\Service {
+
+	use OCA\Files_External\Lib\StorageConfig;
+
+	class GlobalStoragesService {
+		/**
+		 * @return StorageConfig[]
+		 */
+		public function getAllStorages(): array {
+
+		}
+	}
+}
+
+namespace OCA\Files_External\Lib\Backend {
+	interface Backend {
+		public function getStorageClass(): string;
+	}
+
+	class AmazonS3 implements Backend {
+		public function getStorageClass(): string {
+
+		}
+	}
+}
+
+namespace OCA\Files_External\Lib {
+
+	use OCA\Files_External\Lib\Backend\Backend;
+
+	class StorageConfig {
+		public function getBackend(): Backend {
+		}
+		public function getBackendOptions(): array {
+		}
+		public function getId(): ?string {
+		}
+		public function getMountPoint(): string {
+		}
+	}
+}
+
+namespace OCA\Files_External\Lib\Storage {
+
+	use OC\Files\ObjectStore\S3ConnectionTrait;
+	use Aws\S3\S3Client;
+
+	class AmazonS3 extends \OC\Files\Storage\AbstractStorage implements S3ConnectionTrait {
+		public function getConnection(): S3Client {
+		}
+		public function getBucket(): string {
+		}
+	}
+}
+
+namespace OC\Files\ObjectStore {
+
+	use Aws\S3\S3Client;
+
+	class ObjectStoreStorage {
+		public function getObjectStore(): ObjectStore {
+		}
+
+		public function getURN($urn): string{
+		}
+	}
+
+	interface S3ConnectionTrait {
+		public function getConnection(): S3Client;
+		public function getBucket(): string;
+	}
+
+	interface ObjectStore {
+
+	}
+
+	class S3 extends \OC\Files\Storage\AbstractStorage implements S3ConnectionTrait, ObjectStore {
+		public function getConnection(): S3Client {
+		}
+		public function getBucket(): string {
+		}
+	}
+}
+
+namespace OCA\Files_Versions\Versions {
+	use OCP\Files\File;
+	use OCP\Files\FileInfo;
+	use OCP\Files\Storage\IStorage;
+	use OCP\IUser;
+
+	interface IVersionBackend {
+		public function useBackendForStorage(IStorage $storage): bool;
+		/**
+		 * @return IVersion[]
+		 */
+		public function getVersionsForFile(IUser $user, FileInfo $file): array;
+		public function createVersion(IUser $user, FileInfo $file);
+		public function rollback(IVersion $version);
+		public function read(IVersion $version);
+		public function getVersionFile(IUser $user, FileInfo $sourceFile, $revision): File;
+	}
+
+	interface IVersion {
+		public function getBackend(): IVersionBackend;
+		public function getSourceFile(): FileInfo;
+		public function getRevisionId();
+		public function getTimestamp(): int;
+		public function getSize(): int;
+		public function getSourceFileName(): string;
+		public function getMimeType(): string;
+		public function getVersionPath(): string;
+		public function getUser(): IUser;
+	}
+
+	class Version implements IVersion {
+		public function __construct(
+			int $timestamp,
+			$revisionId,
+			string $name,
+			int $size,
+			string $mimetype,
+			string $path,
+			FileInfo $sourceFileInfo,
+			IVersionBackend $backend,
+			IUser $user
+		) {}
+
+		public function getBackend(): IVersionBackend {}
+
+		public function getSourceFile(): FileInfo {}
+
+		public function getRevisionId() {}
+
+		public function getTimestamp(): int {}
+
+		public function getSize(): int {}
+
+		public function getSourceFileName(): string {}
+
+		public function getMimeType(): string {}
+
+		public function getVersionPath(): string {}
+
+		public function getUser(): IUser {}
+	}
+}
+
+namespace OC\Files\Storage {
+
+	use OCP\Files\Storage\IStorage;
+
+	class AbstractStorage implements IStorage {
+		public function __construct($parameters) {
+		}
+		public function getId() {
+		}
+		public function mkdir($path) {
+		}
+		public function rmdir($path) {
+		}
+		public function opendir($path) {
+		}
+		public function is_dir($path) {
+		}
+		public function is_file($path) {
+		}
+		public function stat($path) {
+		}
+		public function filetype($path) {
+		}
+		public function filesize($path) {
+		}
+		public function isCreatable($path) {
+		}
+		public function isReadable($path) {
+		}
+		public function isUpdatable($path) {
+		}
+		public function isDeletable($path) {
+		}
+		public function isSharable($path) {
+		}
+		public function getPermissions($path) {
+		}
+		public function file_exists($path) {
+		}
+		public function filemtime($path) {
+		}
+		public function file_get_contents($path) {
+		}
+		public function file_put_contents($path, $data) {
+		}
+		public function unlink($path) {
+		}
+		public function rename($path1, $path2) {
+		}
+		public function copy($path1, $path2) {
+		}
+		public function fopen($path, $mode) {
+		}
+		public function getMimeType($path) {
+		}
+		public function hash($type, $path, $raw = false) {
+		}
+		public function free_space($path) {
+		}
+		public function touch($path, $mtime = null) {
+		}
+		public function getLocalFile($path) {
+		}
+		public function hasUpdated($path, $time) {
+		}
+		public function getETag($path) {
+		}
+		public function isLocal() {
+		}
+		public function instanceOfStorage($class) {
+		}
+		public function getDirectDownload($path) {
+		}
+		public function verifyPath($path, $fileName) {
+		}
+		public function copyFromStorage(IStorage $sourceStorage, $sourceInternalPath, $targetInternalPath) {
+		}
+		public function moveFromStorage(IStorage $sourceStorage, $sourceInternalPath, $targetInternalPath) {
+		}
+		public function test() {
+		}
+		public function getAvailability() {
+		}
+		public function setAvailability($isAvailable) {
+		}
+		public function getOwner($path) {
+		}
+		public function getCache() {
+		}
+		public function getPropagator() {
+		}
+		public function getScanner() {
+		}
+		public function getUpdater() {
+		}
+		public function getWatcher() {
+		}
+	}
+}
+
+namespace OC\Hooks {
+	interface Emitter {
+		
+	}
+}

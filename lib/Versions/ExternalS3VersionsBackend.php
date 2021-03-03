@@ -40,6 +40,7 @@ class ExternalS3VersionsBackend extends AbstractS3VersionBackend {
 	protected function getS3(FileInfo $file) {
 		$storage = $file->getStorage();
 		if ($storage->instanceOfStorage(AmazonS3::class)) {
+			/** @var AmazonS3 $storage */
 			return $storage;
 		} else {
 			return null;

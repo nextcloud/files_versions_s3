@@ -40,23 +40,23 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 	}
 
 	public function getContent() {
-		stream_get_contents(($this->contentProvider)());
+		return stream_get_contents(($this->contentProvider)());
 	}
 
 	public function putContent($data) {
-		throw new ForbiddenException('Preview files are read only');
+		throw new ForbiddenException('Preview files are read only', false);
 	}
 
 	public function fopen($mode) {
 		if ($mode === 'r' || $mode === 'rb') {
 			return ($this->contentProvider)();
 		} else {
-			throw new ForbiddenException('Preview files are read only');
+			throw new ForbiddenException('Preview files are read only', false);
 		}
 	}
 
 	public function hash($type, $raw = false) {
-		// TODO: Implement hash() method.
+		return '';
 	}
 
 	public function getChecksum() {
@@ -112,19 +112,19 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 	}
 
 	public function move($targetPath) {
-		throw new ForbiddenException('Preview files are read only');
+		throw new ForbiddenException('Preview files are read only', false);
 	}
 
 	public function delete() {
-		throw new ForbiddenException('Preview files are read only');
+		throw new ForbiddenException('Preview files are read only', false);
 	}
 
 	public function copy($targetPath) {
-		throw new ForbiddenException('Preview files are read only');
+		throw new ForbiddenException('Preview files are read only', false);
 	}
 
 	public function touch($mtime = null) {
-		throw new ForbiddenException('Preview files are read only');
+		throw new ForbiddenException('Preview files are read only', false);
 	}
 
 	public function getStorage() {
@@ -140,7 +140,7 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 	}
 
 	public function getId() {
-		return $this->sourceFile->getId();
+		return (int)$this->sourceFile->getId();
 	}
 
 	public function stat() {
@@ -179,7 +179,11 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 	}
 
 	public function getParent() {
-		return $this->sourceFile->getParent();
+		if ($this->sourceFile instanceof File) {
+			return $this->sourceFile->getParent();
+		} else {
+			throw new \Exception("Invalid file");
+		}
 	}
 
 	public function getName() {

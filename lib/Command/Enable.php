@@ -45,7 +45,7 @@ class Enable extends Base {
 			->addArgument('id', InputArgument::REQUIRED, 'Id of the s3 configuration to enable versioning for');
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$configs = $this->configManager->getS3Configs();
 
 		$id = $input->getArgument('id');

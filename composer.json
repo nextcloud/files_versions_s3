@@ -5,7 +5,8 @@
 		"phpunit/phpunit": "^8",
 		"friendsofphp/php-cs-fixer": "^2",
 		"phpstan/phpstan": "^0.12",
-		"psalm/phar": "^4.3"
+		"psalm/phar": "^4.3",
+		"aws/aws-sdk-php": "^3.35"
 	},
 	"scripts": {
 		"lint": "parallel-lint --exclude src --exclude vendor --exclude target --exclude build .",

@@ -43,7 +43,7 @@ class Status extends Base {
 			->setDescription('S3 object versioning status');
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output) {
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$configs = $this->configManager->getS3Configs();
 
 		$status = [];
@@ -68,5 +68,7 @@ class Status extends Base {
 		}
 
 		$this->writeArrayInOutputFormat($input, $output, $status);
+
+		return 0;
 	}
 }
