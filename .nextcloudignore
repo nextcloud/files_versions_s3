@@ -8,3 +8,5 @@ screenshots
 .nextcloudignore
 composer*
 ._php_cs*
+tests
+psalm.xml
