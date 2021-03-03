@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.1.5
+- Gracefully handle mis-configured S3 external storages
+
 ## v0.1.4
 - Compatible with Nextcloud 20 and 21
 
