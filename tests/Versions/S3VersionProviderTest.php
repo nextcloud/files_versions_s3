@@ -22,12 +22,12 @@
 namespace OCA\FilesVersionsS3\Tests\Versions;
 
 use OCA\Files_Versions\Versions\IVersionBackend;
+use OCA\FilesVersionsS3\Tests\TestCase;
 use OCA\FilesVersionsS3\Command\ConfigManager;
 use OCA\FilesVersionsS3\Command\S3Config;
 use OCA\FilesVersionsS3\Versions\S3VersionProvider;
 use OCP\Files\FileInfo;
 use OCP\IUser;
-use Test\TestCase;
 
 /**
  * @group DB

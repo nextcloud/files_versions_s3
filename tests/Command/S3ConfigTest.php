@@ -19,11 +19,11 @@
  *
  */
 
-namespace OCA\FilesVersionsS3\Tests;
+namespace OCA\FilesVersionsS3\Tests\Command;
 
 use OCA\FilesVersionsS3\Command\ConfigManager;
 use OCA\FilesVersionsS3\Command\S3Config;
-use Test\TestCase;
+use OCA\FilesVersionsS3\Tests\TestCase;
 
 /**
  * @group DB

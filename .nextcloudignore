@@ -6,3 +6,5 @@
 krankerl.toml
 screenshots
 .nextcloudignore
+composer*
+._php_cs*
