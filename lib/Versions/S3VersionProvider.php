@@ -48,9 +48,13 @@ class S3VersionProvider {
 			'Bucket' => $objectStore->getBucket(),
 			'Prefix' => $urn,
 		]);
-		$s3versions = array_values(array_filter($result['Versions'], function (array $version) {
-			return !$version['IsLatest'];
-		}));
+		if ($result['Versions']) {
+			$s3versions = array_values(array_filter($result['Versions'], function (array $version) {
+				return !$version['IsLatest'];
+			}));
+		} else {
+			$s3versions = [];
+		}
 		$versions = array_map(function (array $version) use ($user, $sourceFile, $backend) {
 			/** @var DateTimeResult $lastModified */
 			$lastModified = $version['LastModified'];
