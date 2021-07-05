@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace OCA\FilesVersionsS3\Versions;
 
 use OC\Files\ObjectStore\S3ConnectionTrait;
+use OC\Files\Storage\Wrapper\Jail;
 use OCA\Files_External\Lib\Storage\AmazonS3;
 use OCP\Files\FileInfo;
 use OCP\Files\Storage\IStorage;
@@ -48,6 +49,13 @@ class ExternalS3VersionsBackend extends AbstractS3VersionBackend {
 	}
 
 	protected function getUrn(FileInfo $file): string {
-		return $file->getInternalPath();
+		$storage = $file->getStorage();
+		$path = $file->getInternalPath();
+		while ($storage->instanceOfStorage(Jail::class)) {
+			/** @var Jail $storage */
+			$path = $storage->getUnjailedPath($path);
+			$storage = $storage->getUnjailedStorage();
+		}
+		return $path;
 	}
 }
