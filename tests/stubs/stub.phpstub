@@ -283,6 +283,19 @@ namespace OC\Files\Storage {
 	}
 }
 
+namespace OC\Files\Storage\Wrapper {
+
+	use OCP\Files\Storage\IStorage;
+
+	class Jail extends \OC\Files\Storage\AbstractStorage {
+		public function getUnjailedPath(string $path): string {
+		}
+
+		public function getUnjailedStorage(): IStorage {
+		}
+	}
+}
+
 namespace OC\Hooks {
 	interface Emitter {
 
