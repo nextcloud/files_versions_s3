@@ -58,4 +58,8 @@ class ExternalS3VersionsBackend extends AbstractS3VersionBackend {
 		}
 		return $path;
 	}
+
+	protected function postRollback(FileInfo $file) {
+		$file->getStorage()->getUpdater()->update($file->getInternalPath());
+	}
 }

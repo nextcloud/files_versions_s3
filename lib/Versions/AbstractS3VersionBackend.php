@@ -48,6 +48,8 @@ abstract class AbstractS3VersionBackend implements IVersionBackend {
 
 	abstract protected function getUrn(FileInfo $file): string;
 
+	abstract protected function postRollback(FileInfo $file);
+
 	public function getVersionsForFile(IUser $user, FileInfo $file): array {
 		$s3 = $this->getS3($file);
 		if ($s3) {
@@ -65,7 +67,8 @@ abstract class AbstractS3VersionBackend implements IVersionBackend {
 		$source = $version->getSourceFile();
 		$s3 = $this->getS3($source);
 		if ($s3) {
-			$this->versionProvider->rollback($s3, $this->getUrn($version->getSourceFile()), $version->getRevisionId());
+			$this->versionProvider->rollback($s3, $this->getUrn($source), $version->getRevisionId());
+			$this->postRollback($source);
 			return true;
 		}
 
