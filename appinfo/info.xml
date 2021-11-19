@@ -31,7 +31,7 @@ to prevent versions from taking up an ever increasing amount of space.
 	<repository type="git">https://github.com/icewind1991/files_versions_s3.git</repository>
 
 	<dependencies>
-		<nextcloud min-version="20" max-version="22" />
+		<nextcloud min-version="20" max-version="23" />
 	</dependencies>
 
 	<commands>
