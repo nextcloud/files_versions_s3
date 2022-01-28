@@ -8,6 +8,14 @@ This app does not include any mechanism for expiring old s3 versions,
 you should setup your own version expiry (also called "Lifecycle management" in S3)
 to prevent versions from taking up an ever increasing amount of space.
 
+## Nextcloud builtin versioning
+
+Note that the default versioning app for Nextcloud will still work with S3 object storage without enabling this app.
+The default Nextcloud versioning will create new objects for every versioning instead of multiple versions for the same object.
+
+Enabling this app should improve performance when creating new versions of large files and the integration with S3 native
+lifecycle management might be a desired feature, but comes with the downsides as described above.
+
 ## Limitations with renaming/moving files when using external storage
 
 Due to limitations in how versions are stored in S3, when using versioning on an S3 external storage,
