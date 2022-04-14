@@ -94,8 +94,9 @@ namespace OCA\Files_External\Lib\Storage {
 namespace OC\Files\ObjectStore {
 
 	use Aws\S3\S3Client;
+	use OCP\Files\Storage\IStorage;
 
-	class ObjectStoreStorage {
+	abstract class ObjectStoreStorage implements IStorage {
 		public function getObjectStore(): ObjectStore {
 		}
 
