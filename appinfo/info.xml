@@ -16,7 +16,7 @@ to prevent versions from taking up an ever increasing amount of space.
 - install the app
 - check if bucket versioning is enabled for your storage using `occ files_versions_s3:status`
 - enable bucket versioning if not yet enabled using `occ files_versions_s3:enable <id>`]]></description>
-	<version>0.1.8</version>
+	<version>0.1.9</version>
 	<licence>agpl</licence>
 	<author>Robin Appelman</author>
 	<namespace>FilesVersionsS3</namespace>
@@ -31,7 +31,7 @@ to prevent versions from taking up an ever increasing amount of space.
 	<repository type="git">https://github.com/nextcloud/files_versions_s3.git</repository>
 
 	<dependencies>
-		<nextcloud min-version="22" max-version="24" />
+		<nextcloud min-version="23" max-version="25" />
 	</dependencies>
 
 	<commands>
