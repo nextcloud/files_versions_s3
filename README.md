@@ -27,4 +27,4 @@ This issue does not occur when using S3 as primary storage.
 
 - install the app
 - check if bucket versioning is enabled for your storage using `occ files_versions_s3:status`
-- enable bucket versioning if not yet enabled using `occ files_versions_s3:enable <id>`
+- enable bucket versioning if not yet enabled using `occ files_versions_s3:enable <id>`. Where `<id>` is the integer of the storage item from `occ files_versions_s3:status` that you want to enable versioning on.
