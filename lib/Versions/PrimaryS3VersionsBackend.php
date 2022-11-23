@@ -26,6 +26,7 @@ namespace OCA\FilesVersionsS3\Versions;
 use OC\Files\ObjectStore\ObjectStoreStorage;
 use OC\Files\ObjectStore\S3;
 use OC\Files\ObjectStore\S3ConnectionTrait;
+use OCA\Files_Versions\Versions\IVersion;
 use OCP\Files\FileInfo;
 use OCP\Files\Storage\IStorage;
 
@@ -62,11 +63,12 @@ class PrimaryS3VersionsBackend extends AbstractS3VersionBackend {
 		return $storage->getURN($file->getId());
 	}
 
-	protected function postRollback(FileInfo $file) {
+	protected function postRollback(FileInfo $file, IVersion $version) {
 		$cache = $file->getStorage()->getCache();
 		$cache->update($file->getId(), [
 			'mtime' => time(),
-			'etag'  => $file->getStorage()->getETag($file->getInternalPath())
+			'etag'  => $file->getStorage()->getETag($file->getInternalPath()),
+			'size'  => $version->getSize(),
 		]);
 	}
 }

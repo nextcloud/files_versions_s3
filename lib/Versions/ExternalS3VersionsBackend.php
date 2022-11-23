@@ -26,6 +26,7 @@ namespace OCA\FilesVersionsS3\Versions;
 use OC\Files\ObjectStore\S3ConnectionTrait;
 use OC\Files\Storage\Wrapper\Jail;
 use OCA\Files_External\Lib\Storage\AmazonS3;
+use OCA\Files_Versions\Versions\IVersion;
 use OCP\Files\FileInfo;
 use OCP\Files\Storage\IStorage;
 
@@ -59,7 +60,7 @@ class ExternalS3VersionsBackend extends AbstractS3VersionBackend {
 		return $path;
 	}
 
-	protected function postRollback(FileInfo $file) {
+	protected function postRollback(FileInfo $file, IVersion $version) {
 		$file->getStorage()->getUpdater()->update($file->getInternalPath());
 	}
 }
