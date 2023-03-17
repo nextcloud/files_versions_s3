@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<info>
+<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
 	<id>files_versions_s3</id>
 	<name>S3 Versioning</name>
 	<summary>Use S3 object versioning for file versioning</summary>
