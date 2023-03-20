@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<info>
+<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
 	<id>files_versions_s3</id>
 	<name>S3 Versioning</name>
 	<summary>Use S3 object versioning for file versioning</summary>
@@ -16,7 +17,7 @@ to prevent versions from taking up an ever increasing amount of space.
 - install the app
 - check if bucket versioning is enabled for your storage using `occ files_versions_s3:status`
 - enable bucket versioning if not yet enabled using `occ files_versions_s3:enable <id>`]]></description>
-	<version>0.1.9</version>
+	<version>0.1.10</version>
 	<licence>agpl</licence>
 	<author>Robin Appelman</author>
 	<namespace>FilesVersionsS3</namespace>
@@ -31,7 +32,7 @@ to prevent versions from taking up an ever increasing amount of space.
 	<repository type="git">https://github.com/nextcloud/files_versions_s3.git</repository>
 
 	<dependencies>
-		<nextcloud min-version="23" max-version="25" />
+		<nextcloud min-version="24" max-version="26" />
 	</dependencies>
 
 	<commands>
