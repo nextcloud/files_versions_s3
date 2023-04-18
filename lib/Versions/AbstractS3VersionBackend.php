@@ -26,12 +26,14 @@ namespace OCA\FilesVersionsS3\Versions;
 use OC\Files\ObjectStore\S3ConnectionTrait;
 use OCA\Files_Versions\Versions\IVersion;
 use OCA\Files_Versions\Versions\IVersionBackend;
+use OCA\Files_Versions\Versions\INameableVersionBackend;
+use OCA\Files_Versions\Versions\IDeletableVersionBackend;
 use OCP\Files\FileInfo;
 use OCP\Files\File;
 use OCP\Files\Storage\IStorage;
 use OCP\IUser;
 
-abstract class AbstractS3VersionBackend implements IVersionBackend {
+abstract class AbstractS3VersionBackend implements IVersionBackend, INameableVersionBackend, IDeletableVersionBackend {
 	protected $versionProvider;
 
 	public function __construct(S3VersionProvider $versionProvider) {
@@ -94,5 +96,21 @@ abstract class AbstractS3VersionBackend implements IVersionBackend {
 			}, $revision);
 		}
 		throw new \Exception("Requested s3 version for a file not stored in s3");
+	}
+
+	public function setVersionLabel(IVersion $version, string $label): void {
+		$source = $version->getSourceFile();
+		$s3 = $this->getS3($source);
+		if ($s3) {
+			$this->versionProvider->setVersionLabel($s3, $this->getUrn($version->getSourceFile()), $version->getRevisionId(), $label);
+		}
+	}
+
+	public function deleteVersion(IVersion $version): void {
+		$source = $version->getSourceFile();
+		$s3 = $this->getS3($source);
+		if ($s3) {
+			$this->versionProvider->deleteVersion($s3, $this->getUrn($version->getSourceFile()), $version->getRevisionId());
+		}
 	}
 }

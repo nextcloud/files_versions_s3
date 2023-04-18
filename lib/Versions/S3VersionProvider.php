@@ -44,8 +44,10 @@ class S3VersionProvider {
 	 * @throws \Exception
 	 */
 	public function getVersions($objectStore, string $urn, IUser $user, FileInfo $sourceFile, IVersionBackend $backend) {
-		$result = $objectStore->getConnection()->listObjectVersions([
-			'Bucket' => $objectStore->getBucket(),
+		$client = $objectStore->getConnection();
+		$bucket = $objectStore->getBucket();
+		$result = $client->listObjectVersions([
+			'Bucket' => $bucket,
 			'Prefix' => $urn,
 		]);
 		if ($result['Versions']) {
@@ -55,19 +57,34 @@ class S3VersionProvider {
 		} else {
 			$s3versions = [];
 		}
-		$versions = array_map(function (array $version) use ($user, $sourceFile, $backend) {
-			/** @var DateTimeResult $lastModified */
+		$versions = array_map(function (array $version) use ($client, $bucket, $urn, $user, $sourceFile, $backend) {
+			$versionId = $version['VersionId'];
 			$lastModified = $version['LastModified'];
+
+			$tags = $client->getObjectTagging([
+				'Bucket'    => $bucket,
+				'Key'       => $urn,
+				'VersionId' => $versionId,
+			])['TagSet'];
+			$label = '';
+			foreach ($tags as $tag) {
+				if ($tag['Key'] == 'Label') {
+					$label = base64_decode(str_replace('-', '=', $tag['Value']));
+					break;
+				}
+			}
+
 			return new Version(
 				$lastModified->getTimestamp(),
-				$version['VersionId'],
+				$versionId,
 				$sourceFile->getName(),
 				(int)$version['Size'],
 				$sourceFile->getMimetype(),
-				$sourceFile->getId() . '/' . $version['LastModified'],
+				$sourceFile->getId() . '/' . $lastModified,
 				$sourceFile,
 				$backend,
-				$user
+				$user,
+				$label,
 			);
 		}, $s3versions);
 		usort($versions, function (IVersion $a, IVersion $b) {
@@ -122,5 +139,48 @@ class S3VersionProvider {
 
 		$context = stream_context_create($opts);
 		return fopen((string)$request->getUri(), 'r', false, $context);
+	}
+
+	/**
+	 * @param S3ConnectionTrait $objectStore
+	 * @param string $urn
+	 * @param string $versionId
+	 * @param string $label
+	 * @throws \OCP\Files\NotFoundException
+	 */
+	public function setVersionLabel($objectStore, string $urn, string $versionId, string $label) {
+		$client = $objectStore->getConnection();
+		$bucket = $objectStore->getBucket();
+
+		$client->putObjectTagging([
+			'Bucket'    => $bucket,
+			'Key'       => $urn,
+			'VersionId' => $versionId,
+			'Tagging'   => [
+				'TagSet' => [
+					[
+						'Key'   => 'Label',
+						'Value' => str_replace('=', '-', base64_encode($label)),
+					],
+				],
+			],
+		]);
+	}
+
+	/**
+	 * @param S3ConnectionTrait $objectStore
+	 * @param string $urn
+	 * @param string $versionId
+	 * @throws \OCP\Files\NotFoundException
+	 */
+	public function deleteVersion($objectStore, string $urn, string $versionId) {
+		$client = $objectStore->getConnection();
+		$bucket = $objectStore->getBucket();
+
+		$client->deleteObject([
+			'Bucket'    => $bucket,
+			'Key'       => $urn,
+			'VersionId' => $versionId,
+		]);
 	}
 }
