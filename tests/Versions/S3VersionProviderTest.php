@@ -22,9 +22,9 @@
 namespace OCA\FilesVersionsS3\Tests\Versions;
 
 use OCA\Files_Versions\Versions\IVersionBackend;
-use OCA\FilesVersionsS3\Tests\TestCase;
 use OCA\FilesVersionsS3\Command\ConfigManager;
 use OCA\FilesVersionsS3\Command\S3Config;
+use OCA\FilesVersionsS3\Tests\TestCase;
 use OCA\FilesVersionsS3\Versions\S3VersionProvider;
 use OCP\Files\FileInfo;
 use OCP\IUser;
@@ -152,7 +152,7 @@ class S3VersionProviderTest extends TestCase {
 
 		$this->assertEquals('foo', (string)$this->config->getS3()->getObject([
 			'Bucket' => $this->config->getBucket(),
-			'Key'    => "rollback",
+			'Key' => "rollback",
 		])['Body']);
 	}
 }

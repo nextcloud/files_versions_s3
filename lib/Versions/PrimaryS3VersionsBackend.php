@@ -67,8 +67,8 @@ class PrimaryS3VersionsBackend extends AbstractS3VersionBackend {
 		$cache = $file->getStorage()->getCache();
 		$cache->update($file->getId(), [
 			'mtime' => time(),
-			'etag'  => $file->getStorage()->getETag($file->getInternalPath()),
-			'size'  => $version->getSize(),
+			'etag' => $file->getStorage()->getETag($file->getInternalPath()),
+			'size' => $version->getSize(),
 		]);
 	}
 }
