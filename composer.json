@@ -5,7 +5,8 @@
 		"phpunit/phpunit": "^8",
 		"nextcloud/coding-standard": "v1.1.1",
 		"nextcloud/ocp": "dev-master",
-		"psalm/phar": "^4.3"
+		"psalm/phar": "^4.3",
+		"symfony/console": "5.4.19"
 	},
 	"license": "AGPLv3",
 	"require": {},
