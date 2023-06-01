@@ -26,8 +26,8 @@ namespace OCA\FilesVersionsS3\Versions;
 use OC\Files\ObjectStore\S3ConnectionTrait;
 use OCA\Files_Versions\Versions\IVersion;
 use OCA\Files_Versions\Versions\IVersionBackend;
-use OCP\Files\FileInfo;
 use OCP\Files\File;
+use OCP\Files\FileInfo;
 use OCP\Files\Storage\IStorage;
 use OCP\IUser;
 
