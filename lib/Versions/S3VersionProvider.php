@@ -104,9 +104,9 @@ class S3VersionProvider {
 		$bucket = $objectStore->getBucket();
 
 		$client->copyObject([
-			'Bucket'     => $bucket,
+			'Bucket' => $bucket,
 			'CopySource' => S3Client::encodeKey($bucket . '/' . $urn) . '?versionId=' . urlencode($versionId),
-			'Key'        => $urn,
+			'Key' => $urn,
 		]);
 	}
 
@@ -120,8 +120,8 @@ class S3VersionProvider {
 	public function read($objectStore, string $urn, string $versionId) {
 		$client = $objectStore->getConnection();
 		$command = $client->getCommand('GetObject', [
-			'Bucket'    => $objectStore->getBucket(),
-			'Key'       => $urn,
+			'Bucket' => $objectStore->getBucket(),
+			'Key' => $urn,
 			'VersionId' => $versionId,
 		]);
 		$request = \Aws\serialize($command);

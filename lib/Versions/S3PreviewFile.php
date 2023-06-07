@@ -146,7 +146,7 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 	public function stat() {
 		return [
 			'mtime' => $this->getMtime(),
-			'size'  => $this->getSize()
+			'size' => $this->getSize()
 		];
 	}
 
