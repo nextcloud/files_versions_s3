@@ -41,6 +41,12 @@ jobs:
         php-versions: ['8.0']
         server-versions: ['master']
 
+    services:
+      s3:
+        image: localstack/localstack:2.1.0
+        ports:
+          - 4566:4566
+
     steps:
       - name: Set app env
         run: |
@@ -82,13 +88,20 @@ jobs:
         working-directory: apps/${{ env.APP_NAME }}
         run: composer i
 
+      - name: Wait for S3
+        run: |
+          sleep 60
+
       - name: Set up Nextcloud
         env:
           DB_PORT: 4444
         run: |
+          echo "<?php \$CONFIG=['objectstore' => ['class' => 'OC\Files\ObjectStore\S3','arguments' => ['bucket' => 'nextcloud','autocreate' => true,'key' => 'dummy','secret' => 'dummyj','hostname' => 'localhost','port' => 4566,'use_ssl' => false,'use_path_style'=>true]]];" > config/config.php
           mkdir data
           ./occ maintenance:install --verbose --database=sqlite --database-name=nextcloud --database-host=127.0.0.1 --database-port=$DB_PORT --database-user=root --database-pass=rootpassword --admin-user admin --admin-pass admin
           ./occ app:enable --force ${{ env.APP_NAME }}
+          php -f index.php
+          OC_PASS=dummy ./occ user:add dummy --password-from-env
 
       - name: Check PHPUnit script is defined
         id: check_phpunit
