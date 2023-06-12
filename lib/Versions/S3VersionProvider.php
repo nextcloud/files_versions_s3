@@ -23,7 +23,6 @@ declare(strict_types=1);
 
 namespace OCA\FilesVersionsS3\Versions;
 
-use Aws\Api\DateTimeResult;
 use Aws\S3\S3Client;
 use OC\Files\ObjectStore\S3ConnectionTrait;
 use OCA\Files_Versions\Versions\IVersion;
@@ -33,7 +32,6 @@ use OCP\Files\FileInfo;
 use OCP\IUser;
 
 class S3VersionProvider {
-
 	/**
 	 * @param S3ConnectionTrait $objectStore
 	 * @param string $urn
@@ -62,8 +60,8 @@ class S3VersionProvider {
 			$lastModified = $version['LastModified'];
 
 			$tags = $client->getObjectTagging([
-				'Bucket'    => $bucket,
-				'Key'       => $urn,
+				'Bucket' => $bucket,
+				'Key' => $urn,
 				'VersionId' => $versionId,
 			])['TagSet'];
 			$label = '';
@@ -157,7 +155,7 @@ class S3VersionProvider {
 			'Key' => $urn,
 			'VersionId' => $versionId,
 		])['TagSet'];
-		$tags = array_filter($existingTags, function(array $tag) {
+		$tags = array_filter($existingTags, function (array $tag) {
 			return $tag['Key'] !== 'Label';
 		});
 
@@ -197,8 +195,8 @@ class S3VersionProvider {
 		$bucket = $objectStore->getBucket();
 
 		$client->deleteObject([
-			'Bucket'    => $bucket,
-			'Key'       => $urn,
+			'Bucket' => $bucket,
+			'Key' => $urn,
 			'VersionId' => $versionId,
 		]);
 	}

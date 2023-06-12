@@ -24,10 +24,10 @@ declare(strict_types=1);
 namespace OCA\FilesVersionsS3\Versions;
 
 use OC\Files\ObjectStore\S3ConnectionTrait;
-use OCA\Files_Versions\Versions\IVersion;
-use OCA\Files_Versions\Versions\IVersionBackend;
 use OCA\Files_Versions\Versions\INameableVersionBackend;
 use OCA\Files_Versions\Versions\IDeletableVersionBackend;
+use OCA\Files_Versions\Versions\IVersion;
+use OCA\Files_Versions\Versions\IVersionBackend;
 use OCP\Files\File;
 use OCP\Files\FileInfo;
 use OCP\Files\Storage\IStorage;
