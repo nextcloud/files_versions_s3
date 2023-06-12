@@ -152,19 +152,38 @@ class S3VersionProvider {
 		$client = $objectStore->getConnection();
 		$bucket = $objectStore->getBucket();
 
-		$client->putObjectTagging([
-			'Bucket'    => $bucket,
-			'Key'       => $urn,
+		$existingTags = $client->getObjectTagging([
+			'Bucket' => $bucket,
+			'Key' => $urn,
 			'VersionId' => $versionId,
-			'Tagging'   => [
-				'TagSet' => [
-					[
-						'Key'   => 'Label',
-						'Value' => str_replace('=', '-', base64_encode($label)),
-					],
+		])['TagSet'];
+		$tags = array_filter($existingTags, function(array $tag) {
+			return $tag['Key'] !== 'Label';
+		});
+
+		if ($label !== '') {
+			$tags[] = [
+				'Key' => 'Label',
+				'Value' => str_replace('=', '-', base64_encode($label)),
+			];
+		}
+
+		if ($tags) {
+			$client->putObjectTagging([
+				'Bucket' => $bucket,
+				'Key' => $urn,
+				'VersionId' => $versionId,
+				'Tagging' => [
+					'TagSet' => $tags,
 				],
-			],
-		]);
+			]);
+		} else {
+			$client->deleteObjectTagging([
+				'Bucket' => $bucket,
+				'Key' => $urn,
+				'VersionId' => $versionId,
+			]);
+		}
 	}
 
 	/**
