@@ -38,12 +38,21 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.0']
-        server-versions: ['master']
+        include:
+          - localstack: "2.1.0" # rollback is broken in 1.4.0+
+            skip_label: "0"
+            skip_rollback: "1"
+            php-version: "8.0"
+            server-version: "master"
+          - localstack: "1.0.0" # deleting tags is broken in <2.0.0
+            skip_label: "1"
+            skip_rollback: "0"
+            php-version: "8.0"
+            server-version: "master"
 
     services:
       s3:
-        image: localstack/localstack:2.1.0
+        image: localstack/localstack:${{ matrix.localstack }}
         ports:
           - 4566:4566
 
@@ -90,7 +99,7 @@ jobs:
 
       - name: Wait for S3
         run: |
-          sleep 60
+          sleep 30
 
       - name: Set up Nextcloud
         env:
@@ -114,7 +123,7 @@ jobs:
         # Only run if phpunit config file exists
         if: steps.check_phpunit.outcome == 'success'
         working-directory: apps/${{ env.APP_NAME }}
-        run: composer run test:unit
+        run: SKIP_LABEL=${{ matrix.skip_label }} SKIP_ROLLBACK=${{ matrix.skip_rollback }} composer run test:unit
 
       - name: Check PHPUnit integration script is defined
         id: check_integration

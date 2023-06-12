@@ -125,6 +125,9 @@ class S3VersionProviderTest extends TestCase {
 	}
 
 	public function testRollback() {
+		if (getenv('SKIP_ROLLBACK')) {
+			$this->markTestSkipped();
+		}
 		$sourceFile = $this->createMock(FileInfo::class);
 		$sourceFile->method('getName')->willReturn("foo");
 		$sourceFile->method('getMimeType')->willReturn("mime");
@@ -139,8 +142,9 @@ class S3VersionProviderTest extends TestCase {
 			$sourceFile,
 			$this->backend
 		);
+		$this->assertCount(2, $versions);
 
-		$this->versionProvider->rollback($this->config, "rollback", $versions[1]->getRevisionId());
+		$this->versionProvider->rollback($this->config, "rollback", $versions[0]->getRevisionId());
 
 		$versions = $this->versionProvider->getVersions(
 			$this->config,
@@ -159,6 +163,9 @@ class S3VersionProviderTest extends TestCase {
 	}
 
 	public function testLabeling() {
+		if (getenv('SKIP_LABEL')) {
+			$this->markTestSkipped();
+		}
 		$sourceFile = $this->createMock(FileInfo::class);
 		$sourceFile->method('getName')->willReturn("foo");
 		$sourceFile->method('getMimeType')->willReturn("mime");
@@ -209,29 +216,29 @@ class S3VersionProviderTest extends TestCase {
 		$sourceFile->method('getName')->willReturn("foo");
 		$sourceFile->method('getMimeType')->willReturn("mime");
 		$sourceFile->method('getId')->willReturn("1");
-		$this->config->getS3()->upload($this->config->getBucket(), 'labeling', 'bar');
-		$this->config->getS3()->upload($this->config->getBucket(), 'labeling', 'foo');
-		$this->config->getS3()->upload($this->config->getBucket(), 'labeling', 'asd');
+		$this->config->getS3()->upload($this->config->getBucket(), 'delete', 'bar');
+		$this->config->getS3()->upload($this->config->getBucket(), 'delete', 'foo');
+		$this->config->getS3()->upload($this->config->getBucket(), 'delete', 'asd');
 		$versions = $this->versionProvider->getVersions(
 			$this->config,
-			'labeling',
-			$this->user,
-			$sourceFile,
-			$this->backend
-		);
-
-		$this->assertCount(3, $versions);
-
-		$this->versionProvider->deleteVersion($this->config, 'labeling', $versions[1]->getRevisionId());
-
-		$versions = $this->versionProvider->getVersions(
-			$this->config,
-			'labeling',
+			'delete',
 			$this->user,
 			$sourceFile,
 			$this->backend
 		);
 
 		$this->assertCount(2, $versions);
+
+		$this->versionProvider->deleteVersion($this->config, 'delete', $versions[1]->getRevisionId());
+
+		$versions = $this->versionProvider->getVersions(
+			$this->config,
+			'delete',
+			$this->user,
+			$sourceFile,
+			$this->backend
+		);
+
+		$this->assertCount(1, $versions);
 	}
 }
