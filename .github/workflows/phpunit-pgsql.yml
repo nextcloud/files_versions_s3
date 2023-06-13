@@ -51,10 +51,13 @@ jobs:
           POSTGRES_PASSWORD: rootpassword
           POSTGRES_DB: nextcloud
         options: --health-cmd pg_isready --health-interval 5s --health-timeout 2s --health-retries 5
-      s3:
-        image: localstack/localstack:1.0.0
+      minio:
+        env:
+          MINIO_ACCESS_KEY: minio
+          MINIO_SECRET_KEY: minio123
+        image: ghcr.io/icewind1991/minio-ci:main
         ports:
-          - 4566:4566
+          - "9000:9000"
 
     steps:
       - name: Set app env
@@ -99,13 +102,14 @@ jobs:
 
       - name: Wait for S3
         run: |
-          sleep 30
+          sleep 10
+          curl -f -m 1 --retry-connrefused --retry 10 --retry-delay 10 http://localhost:9000/minio/health/ready
 
       - name: Set up Nextcloud
         env:
           DB_PORT: 4444
         run: |
-          echo "<?php \$CONFIG=['objectstore' => ['class' => 'OC\Files\ObjectStore\S3','arguments' => ['bucket' => 'nextcloud','autocreate' => true,'key' => 'dummy','secret' => 'dummyj','hostname' => 'localhost','port' => 4566,'use_ssl' => false,'use_path_style'=>true]]];" > config/config.php
+          echo '<?php $CONFIG=["objectstore" => ["class" => "OC\Files\ObjectStore\S3", "arguments" => ["bucket" => "nextcloud", "autocreate" => true, "key" => "minio", "secret" => "minio123", "hostname" => "localhost", "port" => 9000, "use_ssl" => false, "use_path_style" => true, "uploadPartSize" => 52428800]]];' > config/config.php
           mkdir data
           ./occ maintenance:install --verbose --database=pgsql --database-name=nextcloud --database-host=127.0.0.1 --database-port=$DB_PORT --database-user=root --database-pass=rootpassword --admin-user admin --admin-pass admin
           ./occ app:enable --force ${{ env.APP_NAME }}
@@ -123,7 +127,7 @@ jobs:
         # Only run if phpunit config file exists
         if: steps.check_phpunit.outcome == 'success'
         working-directory: apps/${{ env.APP_NAME }}
-        run: SKIP_LABEL=1 composer run test:unit
+        run: composer run test:unit
 
       - name: Check PHPUnit integration script is defined
         id: check_integration
