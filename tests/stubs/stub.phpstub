@@ -139,6 +139,15 @@ namespace OCA\Files_Versions\Versions {
 		public function getVersionFile(IUser $user, FileInfo $sourceFile, $revision): File;
 	}
 
+	interface INameableVersionBackend {
+		public function setVersionLabel(IVersion $version, string $label): void;
+	}
+
+	interface IDeletableVersionBackend {
+		public function deleteVersion(IVersion $version): void;
+	}
+
+
 	interface IVersion {
 		public function getBackend(): IVersionBackend;
 		public function getSourceFile(): FileInfo;
@@ -161,7 +170,8 @@ namespace OCA\Files_Versions\Versions {
 			string $path,
 			FileInfo $sourceFileInfo,
 			IVersionBackend $backend,
-			IUser $user
+			IUser $user,
+			string $label = ''
 		) {}
 
 		public function getBackend(): IVersionBackend {}

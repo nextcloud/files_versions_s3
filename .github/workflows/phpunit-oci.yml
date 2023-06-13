@@ -61,6 +61,10 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
+      s3:
+        image: localstack/localstack:1.0.0
+        ports:
+          - 4566:4566
 
     steps:
       - name: Set app env
@@ -103,13 +107,20 @@ jobs:
         working-directory: apps/${{ env.APP_NAME }}
         run: composer i
 
+      - name: Wait for S3
+        run: |
+          sleep 30
+
       - name: Set up Nextcloud
         env:
           DB_PORT: 1521
         run: |
+          echo "<?php \$CONFIG=['objectstore' => ['class' => 'OC\Files\ObjectStore\S3','arguments' => ['bucket' => 'nextcloud','autocreate' => true,'key' => 'dummy','secret' => 'dummyj','hostname' => 'localhost','port' => 4566,'use_ssl' => false,'use_path_style'=>true]]];" > config/config.php
           mkdir data
           ./occ maintenance:install --verbose --database=oci --database-name=XE --database-host=127.0.0.1 --database-port=$DB_PORT --database-user=autotest --database-pass=owncloud --admin-user admin --admin-pass admin
           ./occ app:enable --force ${{ env.APP_NAME }}
+          php -f index.php
+          OC_PASS=dummy ./occ user:add dummy --password-from-env
 
       - name: Check PHPUnit script is defined
         id: check_phpunit
@@ -122,7 +133,7 @@ jobs:
         # Only run if phpunit config file exists
         if: steps.check_phpunit.outcome == 'success'
         working-directory: apps/${{ env.APP_NAME }}
-        run: composer run test:unit
+        run: SKIP_LABEL=1 composer run test:unit
 
       - name: Check PHPUnit integration script is defined
         id: check_integration

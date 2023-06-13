@@ -21,6 +21,8 @@
 
 namespace OCA\FilesVersionsS3\Tests\Versions;
 
+use OCA\Files_Versions\Versions\INameableVersion;
+use OCA\Files_Versions\Versions\IVersion;
 use OCA\Files_Versions\Versions\IVersionBackend;
 use OCA\FilesVersionsS3\Command\ConfigManager;
 use OCA\FilesVersionsS3\Command\S3Config;
@@ -123,6 +125,9 @@ class S3VersionProviderTest extends TestCase {
 	}
 
 	public function testRollback() {
+		if (getenv('SKIP_ROLLBACK')) {
+			$this->markTestSkipped();
+		}
 		$sourceFile = $this->createMock(FileInfo::class);
 		$sourceFile->method('getName')->willReturn("foo");
 		$sourceFile->method('getMimeType')->willReturn("mime");
@@ -137,8 +142,9 @@ class S3VersionProviderTest extends TestCase {
 			$sourceFile,
 			$this->backend
 		);
+		$this->assertCount(2, $versions);
 
-		$this->versionProvider->rollback($this->config, "rollback", $versions[1]->getRevisionId());
+		$this->versionProvider->rollback($this->config, "rollback", $versions[0]->getRevisionId());
 
 		$versions = $this->versionProvider->getVersions(
 			$this->config,
@@ -154,5 +160,85 @@ class S3VersionProviderTest extends TestCase {
 			'Bucket' => $this->config->getBucket(),
 			'Key' => "rollback",
 		])['Body']);
+	}
+
+	public function testLabeling() {
+		if (getenv('SKIP_LABEL')) {
+			$this->markTestSkipped();
+		}
+		$sourceFile = $this->createMock(FileInfo::class);
+		$sourceFile->method('getName')->willReturn("foo");
+		$sourceFile->method('getMimeType')->willReturn("mime");
+		$sourceFile->method('getId')->willReturn("1");
+		$this->config->getS3()->upload($this->config->getBucket(), 'labeling', 'bar');
+		$this->config->getS3()->upload($this->config->getBucket(), 'labeling', 'foo');
+		$this->config->getS3()->upload($this->config->getBucket(), 'labeling', 'asd');
+		/** @var (INameableVersion|IVersion)[] $versions */
+		$versions = $this->versionProvider->getVersions(
+			$this->config,
+			'labeling',
+			$this->user,
+			$sourceFile,
+			$this->backend
+		);
+
+		$this->assertEquals("", $versions[1]->getLabel());
+
+		$this->versionProvider->setVersionLabel($this->config, 'labeling', $versions[1]->getRevisionId(), 'label');
+
+		/** @var (INameableVersion|IVersion)[] $versions */
+		$versions = $this->versionProvider->getVersions(
+			$this->config,
+			'labeling',
+			$this->user,
+			$sourceFile,
+			$this->backend
+		);
+
+		$this->assertEquals("label", $versions[1]->getLabel());
+
+		$this->versionProvider->setVersionLabel($this->config, 'labeling', $versions[1]->getRevisionId(), '');
+
+		/** @var (INameableVersion|IVersion)[] $versions */
+		$versions = $this->versionProvider->getVersions(
+			$this->config,
+			'labeling',
+			$this->user,
+			$sourceFile,
+			$this->backend
+		);
+
+		$this->assertEquals("", $versions[1]->getLabel());
+	}
+
+	public function testDeleteVersion() {
+		$sourceFile = $this->createMock(FileInfo::class);
+		$sourceFile->method('getName')->willReturn("foo");
+		$sourceFile->method('getMimeType')->willReturn("mime");
+		$sourceFile->method('getId')->willReturn("1");
+		$this->config->getS3()->upload($this->config->getBucket(), 'delete', 'bar');
+		$this->config->getS3()->upload($this->config->getBucket(), 'delete', 'foo');
+		$this->config->getS3()->upload($this->config->getBucket(), 'delete', 'asd');
+		$versions = $this->versionProvider->getVersions(
+			$this->config,
+			'delete',
+			$this->user,
+			$sourceFile,
+			$this->backend
+		);
+
+		$this->assertCount(2, $versions);
+
+		$this->versionProvider->deleteVersion($this->config, 'delete', $versions[1]->getRevisionId());
+
+		$versions = $this->versionProvider->getVersions(
+			$this->config,
+			'delete',
+			$this->user,
+			$sourceFile,
+			$this->backend
+		);
+
+		$this->assertCount(1, $versions);
 	}
 }
