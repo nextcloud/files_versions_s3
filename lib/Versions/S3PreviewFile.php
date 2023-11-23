@@ -29,9 +29,9 @@ use OCP\Files\ForbiddenException;
 use OCP\Preview\IVersionedPreviewFile;
 
 class S3PreviewFile implements File, IVersionedPreviewFile {
-	private $sourceFile;
+	private FileInfo $sourceFile;
 	private $contentProvider;
-	private $revisionId;
+	private string $revisionId;
 
 	public function __construct(FileInfo $sourceFile, callable $contentProvider, string $revisionId) {
 		$this->sourceFile = $sourceFile;
@@ -208,5 +208,13 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 
 	public function getUploadTime(): int {
 		return 0;
+	}
+
+	public function getParentId(): int {
+		return $this->getParent()->getId();
+	}
+
+	public function getMetadata(): array {
+		return [];
 	}
 }
