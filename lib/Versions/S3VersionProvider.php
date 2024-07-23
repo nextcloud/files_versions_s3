@@ -48,27 +48,32 @@ class S3VersionProvider {
 			'Bucket' => $bucket,
 			'Prefix' => $urn,
 		]);
-		if ($result['Versions']) {
-			$s3versions = array_values(array_filter($result['Versions'], function (array $version) {
-				return !$version['IsLatest'];
-			}));
-		} else {
-			$s3versions = [];
-		}
+		$s3versions = array_values($result['Versions'] ?? []);
 		$versions = array_map(function (array $version) use ($client, $bucket, $urn, $user, $sourceFile, $backend) {
 			$versionId = $version['VersionId'];
 			$lastModified = $version['LastModified'];
 
-			$tags = $client->getObjectTagging([
+			$tagSet = $client->getObjectTagging([
 				'Bucket' => $bucket,
 				'Key' => $urn,
 				'VersionId' => $versionId,
 			])['TagSet'];
-			$label = '';
-			foreach ($tags as $tag) {
-				if ($tag['Key'] == 'Label') {
-					$label = base64_decode(str_replace('-', '=', $tag['Value']));
-					break;
+			$tags = [];
+
+			foreach ($tagSet as $tag) {
+				if (str_starts_with($tag['Key'], 'metadata:')) {
+					$key = preg_replace('/^metadata:/', '', $tag['Key']);
+					$value = base64_decode(str_replace('-', '=', $tag['Value']));
+					$tags[$key] = $value;
+				}
+			}
+
+			// Ensure compatibility with previous way of storing labels.
+			if (!isset($tags['label'])) {
+				foreach ($tagSet as $tag) {
+					if ($tag['Key'] === 'Label') {
+						$tags['label'] = base64_decode(str_replace('-', '=', $tag['Value']));
+					}
 				}
 			}
 
@@ -82,7 +87,7 @@ class S3VersionProvider {
 				$sourceFile,
 				$backend,
 				$user,
-				$label,
+				$tags,
 			);
 		}, $s3versions);
 		usort($versions, function (IVersion $a, IVersion $b) {
@@ -146,42 +151,47 @@ class S3VersionProvider {
 	 * @param string $label
 	 * @throws \OCP\Files\NotFoundException
 	 */
-	public function setVersionLabel($objectStore, string $urn, string $versionId, string $label) {
+	public function setVersionMetadata($objectStore, string $urn, string $versionId, string $key, string $value) {
 		$client = $objectStore->getConnection();
 		$bucket = $objectStore->getBucket();
 
-		$existingTags = $client->getObjectTagging([
+		$tagSet = $client->getObjectTagging([
 			'Bucket' => $bucket,
 			'Key' => $urn,
 			'VersionId' => $versionId,
 		])['TagSet'];
-		$tags = array_filter($existingTags, function (array $tag) {
-			return $tag['Key'] !== 'Label';
-		});
 
-		if ($label !== '') {
-			$tags[] = [
-				'Key' => 'Label',
-				'Value' => str_replace('=', '-', base64_encode($label)),
-			];
-		}
-
-		if ($tags) {
-			$client->putObjectTagging([
-				'Bucket' => $bucket,
-				'Key' => $urn,
-				'VersionId' => $versionId,
-				'Tagging' => [
-					'TagSet' => $tags,
-				],
-			]);
+		if ($value === '') {
+			// Filter the key out if the value is empty
+			$tagSet = array_filter($tagSet, function (array $tag) use ($key) {
+				return $tag['Key'] !== "metadata:$key";
+			});
 		} else {
-			$client->deleteObjectTagging([
-				'Bucket' => $bucket,
-				'Key' => $urn,
-				'VersionId' => $versionId,
-			]);
+			$saved = false;
+			foreach ($tagSet as &$tag) {
+				if ($tag['Key'] === "metadata:$key") {
+					$tag['Value'] = str_replace('=', '-', base64_encode($value));
+					$saved = true;
+					break;
+				}
+			}
+
+			if (!$saved) {
+				$tagSet[] = [
+					'Key' => "metadata:$key",
+					'Value' => str_replace('=', '-', base64_encode($value)),
+				];
+			}
 		}
+
+		$client->putObjectTagging([
+			'Bucket' => $bucket,
+			'Key' => $urn,
+			'VersionId' => $versionId,
+			'Tagging' => [
+				'TagSet' => $tagSet,
+			],
+		]);
 	}
 
 	/**
