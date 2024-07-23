@@ -32,12 +32,13 @@ use OCP\Files\File;
 use OCP\Files\FileInfo;
 use OCP\Files\Storage\IStorage;
 use OCP\IUser;
+use OCP\IUserSession;
 
 abstract class AbstractS3VersionBackend implements IVersionBackend, INameableVersionBackend, IDeletableVersionBackend {
-	protected $versionProvider;
-
-	public function __construct(S3VersionProvider $versionProvider) {
-		$this->versionProvider = $versionProvider;
+	public function __construct(
+		private S3VersionProvider $versionProvider,
+		private IUserSession $userSession,
+	) {
 	}
 
 	abstract public function useBackendForStorage(IStorage $storage): bool;
@@ -66,6 +67,10 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, INameableVer
 	}
 
 	public function rollback(IVersion $version) {
+		if (!$this->currentUserHasPermissions($version->getSourceFile(), \OCP\Constants::PERMISSION_UPDATE)) {
+			throw new Forbidden('You cannot restore this version because you do not have update permissions on the source file.');
+		}
+
 		$source = $version->getSourceFile();
 		$s3 = $this->getS3($source);
 		if ($s3) {
@@ -107,10 +112,24 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, INameableVer
 	}
 
 	public function deleteVersion(IVersion $version): void {
+		if (!$this->currentUserHasPermissions($version->getSourceFile(), \OCP\Constants::PERMISSION_DELETE)) {
+			throw new Forbidden('You cannot delete this version because you do not have delete permissions on the source file.');
+		}
+
 		$source = $version->getSourceFile();
 		$s3 = $this->getS3($source);
 		if ($s3) {
 			$this->versionProvider->deleteVersion($s3, $this->getUrn($version->getSourceFile()), $version->getRevisionId());
 		}
+	}
+
+	private function currentUserHasPermissions(FileInfo $sourceFile, int $permissions): bool {
+		$currentUserId = $this->userSession->getUser()?->getUID();
+
+		if ($currentUserId === null) {
+			throw new NotFoundException("No user logged in");
+		}
+
+		return ($sourceFile->getPermissions() & $permissions) === $permissions;
 	}
 }
