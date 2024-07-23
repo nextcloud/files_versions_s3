@@ -124,6 +124,7 @@ namespace OC\Files\ObjectStore {
 namespace OCA\Files_Versions\Versions {
 	use OCP\Files\File;
 	use OCP\Files\FileInfo;
+	use OCP\Files\Node;
 	use OCP\Files\Storage\IStorage;
 	use OCP\IUser;
 
@@ -147,6 +148,9 @@ namespace OCA\Files_Versions\Versions {
 		public function deleteVersion(IVersion $version): void;
 	}
 
+	interface IMetadataVersionBackend {
+		public function setMetadataValue(Node $node, int $revision, string $key, string $value): void;
+	}
 
 	interface IVersion {
 		public function getBackend(): IVersionBackend;
@@ -171,26 +175,49 @@ namespace OCA\Files_Versions\Versions {
 			FileInfo $sourceFileInfo,
 			IVersionBackend $backend,
 			IUser $user,
-			string $label = ''
-		) {}
+			array $metadata = [],
+		) {
+		}
 
-		public function getBackend(): IVersionBackend {}
+		public function getBackend(): IVersionBackend {
+			throw new \Exception('stub');
+		}
 
-		public function getSourceFile(): FileInfo {}
+		public function getSourceFile(): FileInfo {
+			throw new \Exception('stub');
+		}
 
-		public function getRevisionId() {}
+		public function getRevisionId() {
+			throw new \Exception('stub');
+		}
 
-		public function getTimestamp(): int {}
+		public function getTimestamp(): int {
+			throw new \Exception('stub');
+		}
 
-		public function getSize(): int {}
+		public function getSize(): int {
+			throw new \Exception('stub');
+		}
 
-		public function getSourceFileName(): string {}
+		public function getSourceFileName(): string {
+			throw new \Exception('stub');
+		}
 
-		public function getMimeType(): string {}
+		public function getMimeType(): string {
+			throw new \Exception('stub');
+		}
 
-		public function getVersionPath(): string {}
+		public function getVersionPath(): string {
+			throw new \Exception('stub');
+		}
 
-		public function getUser(): IUser {}
+		public function getUser(): IUser {
+			throw new \Exception('stub');
+		}
+
+		public function getMetadataValue(string $key): ?string {
+			return $this->metadata[$key] ?? null;
+		}
 	}
 }
 
@@ -310,5 +337,28 @@ namespace OC\Files\Storage\Wrapper {
 namespace OC\Hooks {
 	interface Emitter {
 
+	}
+}
+
+namespace OCA\DAV\Connector\Sabre\Exception {
+	class Forbidden extends \Sabre\DAV\Exception\Forbidden {
+		public const NS_OWNCLOUD = 'http://owncloud.org/ns';
+
+		/**
+		* @param string $message
+		* @param bool $retry
+		* @param \Exception $previous
+		*/
+		public function __construct($message, $retry = false, \Exception $previous = null) {}
+
+		/**
+		* This method allows the exception to include additional information
+		* into the WebDAV error response
+		*
+		* @param \Sabre\DAV\Server $server
+		* @param \DOMElement $errorNode
+		* @return void
+		*/
+		public function serialize(\Sabre\DAV\Server $server, \DOMElement $errorNode) {}
 	}
 }
