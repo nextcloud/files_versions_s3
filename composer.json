@@ -15,5 +15,8 @@
 		"cs:fix": "php-cs-fixer fix",
 		"test:unit": "phpunit -c tests/phpunit.xml",
 		"psalm": "psalm.phar"
+	},
+	"require": {
+		"sabre/dav": "^4.6"
 	}
 }
