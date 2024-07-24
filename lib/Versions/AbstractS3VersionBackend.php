@@ -106,14 +106,6 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 		throw new \Exception("Requested s3 version for a file not stored in s3");
 	}
 
-	public function setVersionLabel(IVersion $version, string $label): void {
-		$source = $version->getSourceFile();
-		$s3 = $this->getS3($source);
-		if ($s3) {
-			$this->versionProvider->setVersionMetadata($s3, $this->getUrn($version->getSourceFile()), $version->getRevisionId(), 'label', $label);
-		}
-	}
-
 	public function deleteVersion(IVersion $version): void {
 		if (!$this->currentUserHasPermissions($version->getSourceFile(), \OCP\Constants::PERMISSION_DELETE)) {
 			throw new Forbidden('You cannot delete this version because you do not have delete permissions on the source file.');
