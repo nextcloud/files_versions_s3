@@ -184,7 +184,7 @@ class S3VersionProviderTest extends TestCase {
 
 		$this->assertEquals("", $versions[1]->getLabel());
 
-		$this->versionProvider->setVersionLabel($this->config, 'labeling', $versions[1]->getRevisionId(), 'label');
+		$this->versionProvider->setVersionMetadata($this->config, 'labeling', $versions[1]->getRevisionId(), 'label', 'label');
 
 		/** @var (INameableVersion|IVersion)[] $versions */
 		$versions = $this->versionProvider->getVersions(
@@ -197,7 +197,7 @@ class S3VersionProviderTest extends TestCase {
 
 		$this->assertEquals("label", $versions[1]->getLabel());
 
-		$this->versionProvider->setVersionLabel($this->config, 'labeling', $versions[1]->getRevisionId(), '');
+		$this->versionProvider->setVersionMetadata($this->config, 'labeling', $versions[1]->getRevisionId(), 'label', '');
 
 		/** @var (INameableVersion|IVersion)[] $versions */
 		$versions = $this->versionProvider->getVersions(
