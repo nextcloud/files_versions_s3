@@ -17,7 +17,7 @@ to prevent versions from taking up an ever increasing amount of space.
 - install the app
 - check if bucket versioning is enabled for your storage using `occ files_versions_s3:status`
 - enable bucket versioning if not yet enabled using `occ files_versions_s3:enable <id>`]]></description>
-	<version>0.2.3</version>
+	<version>1.2.0</version>
 	<licence>agpl</licence>
 	<author>Robin Appelman</author>
 	<namespace>FilesVersionsS3</namespace>
