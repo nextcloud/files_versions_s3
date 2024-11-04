@@ -49,6 +49,9 @@ class S3VersionProvider {
 			'Prefix' => $urn,
 		]);
 		$s3versions = array_values($result['Versions'] ?? []);
+		$s3versions = array_filter($s3versions, function (array $version) use ($urn) {
+			return $version['Key'] === $urn;
+		});
 		$versions = array_map(function (array $version) use ($client, $bucket, $urn, $user, $sourceFile, $backend) {
 			$versionId = $version['VersionId'];
 			$lastModified = $version['LastModified'];
