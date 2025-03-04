@@ -75,7 +75,7 @@ class ConfigManager {
 		if ($primaryStorage->instanceOfStorage(ObjectStoreStorage::class) and $primaryStorage->getObjectStore() instanceof S3) {
 			/** @var S3 $s3 */
 			$s3 = $primaryStorage->getObjectStore();
-			$storages[] = new S3Config('primary', $s3->getConnection(), $s3->getBucket(), "Primary Storage");
+			$storages[] = new S3Config('primary', $s3->getConnection(), $s3->getBucket(), 'Primary Storage');
 		}
 
 		return $storages;

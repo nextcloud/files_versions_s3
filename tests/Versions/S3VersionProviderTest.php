@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright (c) 2020 Robin Appelman <robin@icewind.nl>
  *
@@ -55,7 +56,7 @@ class S3VersionProviderTest extends TestCase {
 		});
 
 		if (!$configs) {
-			$this->markTestSkipped("No S3 configured");
+			$this->markTestSkipped('No S3 configured');
 			return;
 		}
 		$this->config = current($configs);
@@ -70,9 +71,9 @@ class S3VersionProviderTest extends TestCase {
 
 	public function testListVersions() {
 		$sourceFile = $this->createMock(FileInfo::class);
-		$sourceFile->method('getName')->willReturn("foo");
-		$sourceFile->method('getMimeType')->willReturn("mime");
-		$sourceFile->method('getId')->willReturn("1");
+		$sourceFile->method('getName')->willReturn('foo');
+		$sourceFile->method('getMimeType')->willReturn('mime');
+		$sourceFile->method('getId')->willReturn('1');
 		$this->config->getS3()->upload($this->config->getBucket(), 'foo', 'bar');
 
 		// delay to make sure we have distinct timestamps for sorting
@@ -103,9 +104,9 @@ class S3VersionProviderTest extends TestCase {
 
 	public function testReadVersion() {
 		$sourceFile = $this->createMock(FileInfo::class);
-		$sourceFile->method('getName')->willReturn("foo");
-		$sourceFile->method('getMimeType')->willReturn("mime");
-		$sourceFile->method('getId')->willReturn("1");
+		$sourceFile->method('getName')->willReturn('foo');
+		$sourceFile->method('getMimeType')->willReturn('mime');
+		$sourceFile->method('getId')->willReturn('1');
 		$this->config->getS3()->upload($this->config->getBucket(), 'bar', 'bar');
 		sleep(1);
 		$this->config->getS3()->upload($this->config->getBucket(), 'bar', 'foo');
@@ -116,11 +117,11 @@ class S3VersionProviderTest extends TestCase {
 
 		$this->assertEquals(
 			'bar',
-			stream_get_contents($this->versionProvider->read($this->config, "bar", $versions[1]->getRevisionId()))
+			stream_get_contents($this->versionProvider->read($this->config, 'bar', $versions[1]->getRevisionId()))
 		);
 		$this->assertEquals(
 			'foo',
-			stream_get_contents($this->versionProvider->read($this->config, "bar", $versions[0]->getRevisionId()))
+			stream_get_contents($this->versionProvider->read($this->config, 'bar', $versions[0]->getRevisionId()))
 		);
 	}
 
@@ -129,9 +130,9 @@ class S3VersionProviderTest extends TestCase {
 			$this->markTestSkipped();
 		}
 		$sourceFile = $this->createMock(FileInfo::class);
-		$sourceFile->method('getName')->willReturn("foo");
-		$sourceFile->method('getMimeType')->willReturn("mime");
-		$sourceFile->method('getId')->willReturn("1");
+		$sourceFile->method('getName')->willReturn('foo');
+		$sourceFile->method('getMimeType')->willReturn('mime');
+		$sourceFile->method('getId')->willReturn('1');
 		$this->config->getS3()->upload($this->config->getBucket(), 'rollback', 'bar');
 		$this->config->getS3()->upload($this->config->getBucket(), 'rollback', 'foo');
 		$this->config->getS3()->upload($this->config->getBucket(), 'rollback', 'asd');
@@ -144,7 +145,7 @@ class S3VersionProviderTest extends TestCase {
 		);
 		$this->assertCount(2, $versions);
 
-		$this->versionProvider->rollback($this->config, "rollback", $versions[0]->getRevisionId());
+		$this->versionProvider->rollback($this->config, 'rollback', $versions[0]->getRevisionId());
 
 		$versions = $this->versionProvider->getVersions(
 			$this->config,
@@ -158,7 +159,7 @@ class S3VersionProviderTest extends TestCase {
 
 		$this->assertEquals('foo', (string)$this->config->getS3()->getObject([
 			'Bucket' => $this->config->getBucket(),
-			'Key' => "rollback",
+			'Key' => 'rollback',
 		])['Body']);
 	}
 
@@ -167,9 +168,9 @@ class S3VersionProviderTest extends TestCase {
 			$this->markTestSkipped();
 		}
 		$sourceFile = $this->createMock(FileInfo::class);
-		$sourceFile->method('getName')->willReturn("foo");
-		$sourceFile->method('getMimeType')->willReturn("mime");
-		$sourceFile->method('getId')->willReturn("1");
+		$sourceFile->method('getName')->willReturn('foo');
+		$sourceFile->method('getMimeType')->willReturn('mime');
+		$sourceFile->method('getId')->willReturn('1');
 		$this->config->getS3()->upload($this->config->getBucket(), 'labeling', 'bar');
 		$this->config->getS3()->upload($this->config->getBucket(), 'labeling', 'foo');
 		$this->config->getS3()->upload($this->config->getBucket(), 'labeling', 'asd');
@@ -182,7 +183,7 @@ class S3VersionProviderTest extends TestCase {
 			$this->backend
 		);
 
-		$this->assertEquals("", $versions[1]->getLabel());
+		$this->assertEquals('', $versions[1]->getLabel());
 
 		$this->versionProvider->setVersionMetadata($this->config, 'labeling', $versions[1]->getRevisionId(), 'label', 'label');
 
@@ -195,7 +196,7 @@ class S3VersionProviderTest extends TestCase {
 			$this->backend
 		);
 
-		$this->assertEquals("label", $versions[1]->getLabel());
+		$this->assertEquals('label', $versions[1]->getLabel());
 
 		$this->versionProvider->setVersionMetadata($this->config, 'labeling', $versions[1]->getRevisionId(), 'label', '');
 
@@ -208,14 +209,14 @@ class S3VersionProviderTest extends TestCase {
 			$this->backend
 		);
 
-		$this->assertEquals("", $versions[1]->getLabel());
+		$this->assertEquals('', $versions[1]->getLabel());
 	}
 
 	public function testDeleteVersion() {
 		$sourceFile = $this->createMock(FileInfo::class);
-		$sourceFile->method('getName')->willReturn("foo");
-		$sourceFile->method('getMimeType')->willReturn("mime");
-		$sourceFile->method('getId')->willReturn("1");
+		$sourceFile->method('getName')->willReturn('foo');
+		$sourceFile->method('getMimeType')->willReturn('mime');
+		$sourceFile->method('getId')->willReturn('1');
 		$this->config->getS3()->upload($this->config->getBucket(), 'delete', 'bar');
 		$this->config->getS3()->upload($this->config->getBucket(), 'delete', 'foo');
 		$this->config->getS3()->upload($this->config->getBucket(), 'delete', 'asd');

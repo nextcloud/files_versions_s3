@@ -39,8 +39,8 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 		$this->revisionId = $revisionId;
 	}
 
-	public function getContent() {
-		return stream_get_contents(($this->contentProvider)());
+	public function getContent(): string {
+		return stream_get_contents(($this->contentProvider)()) ?: '';
 	}
 
 	public function putContent($data) {
@@ -182,7 +182,7 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 		if ($this->sourceFile instanceof File) {
 			return $this->sourceFile->getParent();
 		} else {
-			throw new \Exception("Invalid file");
+			throw new \Exception('Invalid file');
 		}
 	}
 
