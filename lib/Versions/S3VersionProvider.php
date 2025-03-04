@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace OCA\FilesVersionsS3\Versions;
 
+use Aws\Api\DateTimeResult;
 use Aws\S3\S3Client;
 use OC\Files\ObjectStore\S3ConnectionTrait;
 use OCA\Files_Versions\Versions\IVersion;
@@ -48,6 +49,7 @@ class S3VersionProvider {
 			'Bucket' => $bucket,
 			'Prefix' => $urn,
 		]);
+		/** @var list<array{Key: string, VersionId: string, LastModified: DateTimeResult, Size: string, isLatest: bool, ETag: string}> $s3versions */
 		$s3versions = array_values($result['Versions'] ?? []);
 		$s3versions = array_filter($s3versions, function (array $version) use ($urn) {
 			return $version['Key'] === $urn;
@@ -65,9 +67,12 @@ class S3VersionProvider {
 
 			foreach ($tagSet as $tag) {
 				if (str_starts_with($tag['Key'], 'metadata:')) {
+					/** @var string $key */
 					$key = preg_replace('/^metadata:/', '', $tag['Key']);
 					$value = base64_decode(str_replace('-', '=', $tag['Value']));
-					$tags[$key] = $value;
+					if ($value) {
+						$tags[$key] = $value;
+					}
 				}
 			}
 
@@ -75,7 +80,10 @@ class S3VersionProvider {
 			if (!isset($tags['label'])) {
 				foreach ($tagSet as $tag) {
 					if ($tag['Key'] === 'Label') {
-						$tags['label'] = base64_decode(str_replace('-', '=', $tag['Value']));
+						$value = base64_decode(str_replace('-', '=', $tag['Value']));
+						if ($value) {
+							$tags['label'] = $value;
+						}
 					}
 				}
 			}
@@ -86,7 +94,7 @@ class S3VersionProvider {
 				$sourceFile->getName(),
 				(int)$version['Size'],
 				$sourceFile->getMimetype(),
-				$sourceFile->getId() . '/' . $lastModified,
+				$sourceFile->getId() . '/' . $lastModified->format('c'),
 				$sourceFile,
 				$backend,
 				$user,

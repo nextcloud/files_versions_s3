@@ -39,8 +39,8 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 		$this->revisionId = $revisionId;
 	}
 
-	public function getContent() {
-		return stream_get_contents(($this->contentProvider)());
+	public function getContent(): string {
+		return stream_get_contents(($this->contentProvider)()) ?: '';
 	}
 
 	public function putContent($data) {
