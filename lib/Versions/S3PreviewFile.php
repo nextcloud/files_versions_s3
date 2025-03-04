@@ -182,7 +182,7 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 		if ($this->sourceFile instanceof File) {
 			return $this->sourceFile->getParent();
 		} else {
-			throw new \Exception("Invalid file");
+			throw new \Exception('Invalid file');
 		}
 	}
 

@@ -103,7 +103,7 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 				return $this->versionProvider->read($s3, $this->getUrn($sourceFile), $revision);
 			}, $revision);
 		}
-		throw new \Exception("Requested s3 version for a file not stored in s3");
+		throw new \Exception('Requested s3 version for a file not stored in s3');
 	}
 
 	public function deleteVersion(IVersion $version): void {
@@ -136,7 +136,7 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 		$currentUserId = $this->userSession->getUser()?->getUID();
 
 		if ($currentUserId === null) {
-			throw new NotFoundException("No user logged in");
+			throw new NotFoundException('No user logged in');
 		}
 
 		return ($sourceFile->getPermissions() & $permissions) === $permissions;

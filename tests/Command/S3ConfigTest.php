@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright (c) 2020 Robin Appelman <robin@icewind.nl>
  *
@@ -43,7 +44,7 @@ class S3ConfigTest extends TestCase {
 		});
 
 		if (!$configs) {
-			$this->markTestSkipped("No S3 configured");
+			$this->markTestSkipped('No S3 configured');
 			return;
 		}
 		$this->config = current($configs);
@@ -51,7 +52,7 @@ class S3ConfigTest extends TestCase {
 
 	public function testEnable() {
 		if ($this->config->versioningEnabled()) {
-			$this->markTestSkipped("S3 versioning already enabled");
+			$this->markTestSkipped('S3 versioning already enabled');
 			return;
 		}
 
