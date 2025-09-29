@@ -8,20 +8,21 @@ declare(strict_types=1);
 
 namespace OCA\FilesVersionsS3\Versions;
 
+use OCA\Files_Versions\Versions\IVersion;
 use OCP\Files\File;
 use OCP\Files\FileInfo;
 use OCP\Files\ForbiddenException;
 use OCP\Preview\IVersionedPreviewFile;
 
 class S3PreviewFile implements File, IVersionedPreviewFile {
-	private FileInfo $sourceFile;
-	private $contentProvider;
-	private string $revisionId;
-
-	public function __construct(FileInfo $sourceFile, callable $contentProvider, string $revisionId) {
-		$this->sourceFile = $sourceFile;
-		$this->contentProvider = $contentProvider;
-		$this->revisionId = $revisionId;
+	/**
+	 * @param callable $contentProvider
+	 */
+	public function __construct(
+		private FileInfo $sourceFile,
+		private $contentProvider,
+		private IVersion $version,
+	) {
 	}
 
 	public function getContent(): string {
@@ -49,7 +50,7 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 	}
 
 	public function getMtime() {
-		return $this->sourceFile->getMtime();
+		return $this->version->getTimestamp();
 	}
 
 	public function getMimetype() {
@@ -93,7 +94,7 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 	}
 
 	public function getPreviewVersion(): string {
-		return $this->revisionId;
+		return $this->version->getRevisionId();
 	}
 
 	public function move($targetPath) {
@@ -140,7 +141,7 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 	}
 
 	public function getEtag() {
-		return $this->revisionId;
+		return $this->version->getRevisionId();
 	}
 
 	public function getPermissions() {

@@ -84,9 +84,20 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 	public function getVersionFile(IUser $user, FileInfo $sourceFile, $revision): File {
 		$s3 = $this->getS3($sourceFile);
 		if ($s3) {
+			$versions = $this->getVersionsForFile($user, $sourceFile);
+			$revisionVersion = null;
+			foreach ($versions as $version) {
+				if ($version->getRevisionId() === $revision) {
+					$revisionVersion = $version;
+				}
+			}
+			if ($revisionVersion === null) {
+				throw new NotFoundException("Version not found for revision $revision");
+			}
+
 			return new S3PreviewFile($sourceFile, function () use ($s3, $sourceFile, $revision) {
 				return $this->versionProvider->read($s3, $this->getUrn($sourceFile), $revision);
-			}, $revision);
+			}, $revisionVersion);
 		}
 		throw new \Exception('Requested s3 version for a file not stored in s3');
 	}
@@ -125,5 +136,9 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 		}
 
 		return ($sourceFile->getPermissions() & $permissions) === $permissions;
+	}
+
+	public function getRevision(Node $node): int {
+		return $node->getMTime();
 	}
 }
