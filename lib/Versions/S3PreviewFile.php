@@ -11,8 +11,15 @@ namespace OCA\FilesVersionsS3\Versions;
 use OCA\Files_Versions\Versions\IVersion;
 use OCP\Files\File;
 use OCP\Files\FileInfo;
+use OCP\Files\Folder;
 use OCP\Files\ForbiddenException;
+use OCP\Files\IRootFolder;
+use OCP\Files\Mount\IMountPoint;
+use OCP\Files\Node;
+use OCP\Files\Storage\IStorage;
+use OCP\IUser;
 use OCP\Preview\IVersionedPreviewFile;
+use Override;
 
 class S3PreviewFile implements File, IVersionedPreviewFile {
 	/**
@@ -25,14 +32,17 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 	) {
 	}
 
+	#[Override]
 	public function getContent(): string {
 		return stream_get_contents(($this->contentProvider)()) ?: '';
 	}
 
-	public function putContent($data) {
+	#[Override]
+	public function putContent($data): void {
 		throw new ForbiddenException('Preview files are read only', false);
 	}
 
+	#[Override]
 	public function fopen($mode) {
 		if ($mode === 'r' || $mode === 'rb') {
 			return ($this->contentProvider)();
@@ -41,130 +51,161 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 		}
 	}
 
-	public function hash($type, $raw = false) {
+	#[Override]
+	public function hash($type, $raw = false): string {
 		return '';
 	}
 
-	public function getChecksum() {
+	#[Override]
+	public function getChecksum(): string {
 		return '';
 	}
 
+	#[Override]
 	public function getMtime() {
 		return $this->version->getTimestamp();
 	}
 
-	public function getMimetype() {
+	#[Override]
+	public function getMimetype(): string {
 		return $this->sourceFile->getMimeType();
 	}
 
-	public function getMimePart() {
+	#[Override]
+	public function getMimePart(): string {
 		return $this->sourceFile->getMimePart();
 	}
 
-	public function isEncrypted() {
+	#[Override]
+	public function isEncrypted(): bool {
 		return $this->sourceFile->isEncrypted();
 	}
 
-	public function getType() {
+	#[Override]
+	public function getType(): string {
 		return $this->sourceFile->getType();
 	}
 
-	public function isCreatable() {
+	#[Override]
+	public function isCreatable(): bool {
 		return $this->sourceFile->isCreatable();
 	}
 
-	public function isShared() {
+	#[Override]
+	public function isShared(): bool {
 		return $this->sourceFile->isShared();
 	}
 
-	public function isMounted() {
+	#[Override]
+	public function isMounted(): bool {
 		return $this->sourceFile->isMounted();
 	}
 
-	public function getMountPoint() {
+	#[Override]
+	public function getMountPoint(): IMountPoint {
 		return $this->sourceFile->getMountPoint();
 	}
 
-	public function getOwner() {
+	#[Override]
+	public function getOwner(): ?IUser {
 		return $this->sourceFile->getOwner();
 	}
 
+	#[Override]
 	public function getExtension(): string {
 		return $this->sourceFile->getExtension();
 	}
 
+	#[Override]
 	public function getPreviewVersion(): string {
 		return $this->version->getRevisionId();
 	}
 
-	public function move($targetPath) {
+	#[Override]
+	public function move($targetPath): Node {
 		throw new ForbiddenException('Preview files are read only', false);
 	}
 
-	public function delete() {
+	#[Override]
+	public function delete(): void {
 		throw new ForbiddenException('Preview files are read only', false);
 	}
 
-	public function copy($targetPath) {
+	#[Override]
+	public function copy($targetPath): Node {
 		throw new ForbiddenException('Preview files are read only', false);
 	}
 
-	public function touch($mtime = null) {
+	#[Override]
+	public function touch($mtime = null): void {
 		throw new ForbiddenException('Preview files are read only', false);
 	}
 
-	public function getStorage() {
+	#[Override]
+	public function getStorage(): IStorage {
 		return $this->sourceFile->getStorage();
 	}
 
-	public function getPath() {
+	#[Override]
+	public function getPath(): string {
 		return $this->sourceFile->getPath();
 	}
 
-	public function getInternalPath() {
+	#[Override]
+	public function getInternalPath(): string {
 		return $this->sourceFile->getInternalPath();
 	}
 
-	public function getId() {
+	#[Override]
+	public function getId(): int {
 		return (int)$this->sourceFile->getId();
 	}
 
-	public function stat() {
+	#[Override]
+	public function stat(): array {
 		return [
 			'mtime' => $this->getMtime(),
 			'size' => $this->getSize()
 		];
 	}
 
-	public function getSize($includeMounts = true) {
+	#[Override]
+	public function getSize($includeMounts = true): int|float {
 		return $this->sourceFile->getSize();
 	}
 
-	public function getEtag() {
+	#[Override]
+	public function getEtag(): string {
 		return $this->version->getRevisionId();
 	}
 
-	public function getPermissions() {
+	#[Override]
+	public function getPermissions(): int {
 		return $this->sourceFile->getPermissions();
 	}
 
-	public function isReadable() {
+	#[Override]
+	public function isReadable(): bool {
 		return $this->sourceFile->isReadable();
 	}
 
-	public function isUpdateable() {
+	#[Override]
+	public function isUpdateable(): bool {
 		return $this->sourceFile->isUpdateable();
 	}
 
-	public function isDeletable() {
+	#[Override]
+	public function isDeletable(): bool {
 		return $this->sourceFile->isDeletable();
 	}
 
-	public function isShareable() {
+	#[Override]
+	public function isShareable(): bool {
 		return $this->sourceFile->isShareable();
 	}
 
-	public function getParent() {
+	#[Override]
+	public function getParent(): Folder|IRootFolder {
 		if ($this->sourceFile instanceof File) {
 			return $this->sourceFile->getParent();
 		} else {
@@ -172,34 +213,42 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 		}
 	}
 
-	public function getName() {
+	#[Override]
+	public function getName(): string {
 		return $this->sourceFile->getName();
 	}
 
-	public function lock($type) {
+	#[Override]
+	public function lock($type): void {
 		// noop
 	}
 
-	public function changeLock($targetType) {
+	#[Override]
+	public function changeLock($targetType): void {
 		// noop
 	}
 
-	public function unlock($type) {
+	#[Override]
+	public function unlock($type): void {
 		// noop
 	}
 
+	#[Override]
 	public function getCreationTime(): int {
 		return 0;
 	}
 
+	#[Override]
 	public function getUploadTime(): int {
 		return 0;
 	}
 
+	#[Override]
 	public function getParentId(): int {
 		return $this->getParent()->getId();
 	}
 
+	#[Override]
 	public function getMetadata(): array {
 		return [];
 	}
