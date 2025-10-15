@@ -119,8 +119,13 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 			throw new Forbidden('You cannot update the version\'s metadata because you do not have update permissions on the source file.');
 		}
 
-		$versions = $this->getVersionsForFile($this->userSession->getUser(), $node);
-		$version = array_values(array_filter($versions, fn (IVersion $version) => $version->getTimestamp() === $revision))[0] ?? null;
+		$user = $this->userSession->getUser();
+		if ($user === null) {
+			$versions = [];
+		} else {
+			$versions = $this->getVersionsForFile($user, $node);
+		}
+		$version = array_values(array_filter($versions, fn (IVersion $version): bool => $version->getTimestamp() === $revision))[0] ?? null;
 
 		$s3 = $this->getS3($node);
 		if ($s3 && $version) {

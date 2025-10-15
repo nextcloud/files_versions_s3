@@ -42,10 +42,12 @@ class ConfigManager {
 				return $storage->getBackend() instanceof AmazonS3;
 			});
 			$storages = array_map(function (StorageConfig $config) {
+				/** @var class-string<\OCA\Files_External\Lib\Storage\AmazonS3> $storageClass */
 				$storageClass = $config->getBackend()->getStorageClass();
+
+				/** @var \OCA\Files_External\Lib\Storage\AmazonS3 $storage */
+				$storage = new $storageClass($config->getBackendOptions());
 				try {
-					/** @var \OCA\Files_External\Lib\Storage\AmazonS3 $storage */
-					$storage = new $storageClass($config->getBackendOptions());
 					return new S3Config((string)$config->getId(), $storage->getConnection(), $storage->getBucket(), $config->getMountPoint());
 				} catch (Exception $e) {
 					return new BrokenConfig((string)$config->getId(), $storage->getBucket(), $config->getMountPoint(), $e);

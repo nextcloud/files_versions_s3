@@ -17,6 +17,9 @@ use OCA\Files_Versions\Versions\Version;
 use OCP\Files\FileInfo;
 use OCP\IUser;
 
+/**
+ * @psalm-type S3RawVersion = array{Key: string, VersionId: string, LastModified: DateTimeResult, Size: string, isLatest: bool, ETag: string}
+ */
 class S3VersionProvider {
 	/**
 	 * @param S3ConnectionTrait $objectStore
@@ -30,11 +33,12 @@ class S3VersionProvider {
 	public function getVersions($objectStore, string $urn, IUser $user, FileInfo $sourceFile, IVersionBackend $backend) {
 		$client = $objectStore->getConnection();
 		$bucket = $objectStore->getBucket();
+		/** @var array{Versions: array<S3RawVersion>} $result */
 		$result = $client->listObjectVersions([
 			'Bucket' => $bucket,
 			'Prefix' => $urn,
 		]);
-		/** @var list<array{Key: string, VersionId: string, LastModified: DateTimeResult, Size: string, isLatest: bool, ETag: string}> $s3versions */
+		/** @var list<S3RawVersion> $s3versions */
 		$s3versions = array_values($result['Versions'] ?? []);
 		$s3versions = array_filter($s3versions, function (array $version) use ($urn) {
 			return $version['Key'] === $urn;
@@ -43,6 +47,7 @@ class S3VersionProvider {
 			$versionId = $version['VersionId'];
 			$lastModified = $version['LastModified'];
 
+			/** @var array<string, array{Key: string, Value: string}> $tagSet */
 			$tagSet = $client->getObjectTagging([
 				'Bucket' => $bucket,
 				'Key' => $urn,
@@ -151,6 +156,7 @@ class S3VersionProvider {
 		$client = $objectStore->getConnection();
 		$bucket = $objectStore->getBucket();
 
+		/** @var array<string, array{Key: string, Value: string}> $tagSet */
 		$tagSet = $client->getObjectTagging([
 			'Bucket' => $bucket,
 			'Key' => $urn,
