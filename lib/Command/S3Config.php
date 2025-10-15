@@ -11,16 +11,12 @@ namespace OCA\FilesVersionsS3\Command;
 use Aws\S3\S3Client;
 
 class S3Config {
-	private $id;
-	private $s3;
-	private $bucket;
-	private $name;
-
-	public function __construct(string $id, S3Client $s3, string $bucket, string $name) {
-		$this->id = $id;
-		$this->s3 = $s3;
-		$this->bucket = $bucket;
-		$this->name = $name;
+	public function __construct(
+		private readonly string $id,
+		private readonly S3Client $s3,
+		private readonly string $bucket,
+		private readonly string $name,
+	) {
 	}
 
 	public function getId(): string {
@@ -48,7 +44,7 @@ class S3Config {
 		return $result->get('Status') === 'Enabled';
 	}
 
-	public function enableVersioning() {
+	public function enableVersioning(): void {
 		$this->getS3()->putBucketVersioning([
 			'Bucket' => $this->getBucket(),
 			'VersioningConfiguration' => [

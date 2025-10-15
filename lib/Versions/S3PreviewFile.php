@@ -34,7 +34,11 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 
 	#[Override]
 	public function getContent(): string {
-		return stream_get_contents(($this->contentProvider)()) ?: '';
+		$content = stream_get_contents(($this->contentProvider)());
+		if ($content === false) {
+			return '';
+		}
+		return $content;
 	}
 
 	#[Override]

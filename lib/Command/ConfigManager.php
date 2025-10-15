@@ -15,18 +15,18 @@ use OCA\Files_External\Lib\Backend\AmazonS3;
 use OCA\Files_External\Lib\StorageConfig;
 use OCA\Files_External\Service\GlobalStoragesService;
 use OCP\Files\IRootFolder;
-use OCP\IServerContainer;
+use Psr\Container\ContainerInterface;
 
 class ConfigManager {
-	/** @var GlobalStoragesService|null */
+	/** @var ?GlobalStoragesService $globalService */
 	private $globalService;
-	private $rootFolder;
 
-	public function __construct(IServerContainer $server, IRootFolder $rootFolder) {
-		$this->rootFolder = $rootFolder;
-
+	public function __construct(
+		ContainerInterface $server,
+		private readonly IRootFolder $rootFolder,
+	) {
 		if (class_exists(GlobalStoragesService::class)) {
-			$this->globalService = $server->query(GlobalStoragesService::class);
+			$this->globalService = $server->get(GlobalStoragesService::class);
 		} else {
 			$this->globalService = null;
 		}
@@ -35,7 +35,7 @@ class ConfigManager {
 	/**
 	 * @return (S3Config|BrokenConfig)[]
 	 */
-	public function getS3Configs() {
+	public function getS3Configs(): array {
 		if ($this->globalService) {
 			$externalStorageConfigs = $this->globalService->getAllStorages();
 			$s3StorageConfigs = array_filter($externalStorageConfigs, function (StorageConfig $storage) {

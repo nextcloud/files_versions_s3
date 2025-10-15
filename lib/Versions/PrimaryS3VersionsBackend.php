@@ -48,7 +48,7 @@ class PrimaryS3VersionsBackend extends AbstractS3VersionBackend {
 		return $storage->getURN($file->getId());
 	}
 
-	protected function postRollback(FileInfo $file, IVersion $version) {
+	protected function postRollback(FileInfo $file, IVersion $version): void {
 		$fileId = $file->getId();
 		if ($fileId === null) {
 			return;

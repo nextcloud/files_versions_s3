@@ -24,7 +24,7 @@ class ExternalS3VersionsBackend extends AbstractS3VersionBackend {
 	 * @param FileInfo $file
 	 * @return S3ConnectionTrait|null
 	 */
-	protected function getS3(FileInfo $file) {
+	protected function getS3(FileInfo $file): S3ConnectionTrait|null {
 		$storage = $file->getStorage();
 		if ($storage->instanceOfStorage(AmazonS3::class)) {
 			/** @var AmazonS3 $storage */
@@ -45,7 +45,7 @@ class ExternalS3VersionsBackend extends AbstractS3VersionBackend {
 		return $path;
 	}
 
-	protected function postRollback(FileInfo $file, IVersion $version) {
+	protected function postRollback(FileInfo $file, IVersion $version): void {
 		$file->getStorage()->getUpdater()->update($file->getInternalPath());
 	}
 }
