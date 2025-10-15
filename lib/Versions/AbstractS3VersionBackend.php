@@ -39,7 +39,7 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 
 	abstract protected function getUrn(FileInfo $file): string;
 
-	abstract protected function postRollback(FileInfo $file, IVersion $version);
+	abstract protected function postRollback(FileInfo $file, IVersion $version): void;
 
 	public function getVersionsForFile(IUser $user, FileInfo $file): array {
 		$s3 = $this->getS3($file);
@@ -50,11 +50,11 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 		return [];
 	}
 
-	public function createVersion(IUser $user, FileInfo $file) {
+	public function createVersion(IUser $user, FileInfo $file): void {
 		// noop, handled by S3
 	}
 
-	public function rollback(IVersion $version) {
+	public function rollback(IVersion $version): bool {
 		if (!$this->currentUserHasPermissions($version->getSourceFile(), \OCP\Constants::PERMISSION_UPDATE)) {
 			throw new Forbidden('You cannot restore this version because you do not have update permissions on the source file.');
 		}
@@ -70,6 +70,9 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 		return false;
 	}
 
+	/**
+	 * @return bool|resource
+	 */
 	public function read(IVersion $version) {
 		$source = $version->getSourceFile();
 		$s3 = $this->getS3($source);
@@ -81,6 +84,9 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 		return false;
 	}
 
+	/**
+	 * @param string $revision
+	 */
 	public function getVersionFile(IUser $user, FileInfo $sourceFile, $revision): File {
 		$s3 = $this->getS3($sourceFile);
 		if ($s3) {
@@ -119,8 +125,13 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 			throw new Forbidden('You cannot update the version\'s metadata because you do not have update permissions on the source file.');
 		}
 
-		$versions = $this->getVersionsForFile($this->userSession->getUser(), $node);
-		$version = array_values(array_filter($versions, fn (IVersion $version) => $version->getTimestamp() === $revision))[0] ?? null;
+		$user = $this->userSession->getUser();
+		if ($user === null) {
+			$versions = [];
+		} else {
+			$versions = $this->getVersionsForFile($user, $node);
+		}
+		$version = array_values(array_filter($versions, fn (IVersion $version): bool => $version->getTimestamp() === $revision))[0] ?? null;
 
 		$s3 = $this->getS3($node);
 		if ($s3 && $version) {

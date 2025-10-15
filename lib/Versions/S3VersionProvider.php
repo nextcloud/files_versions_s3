@@ -14,9 +14,14 @@ use OC\Files\ObjectStore\S3ConnectionTrait;
 use OCA\Files_Versions\Versions\IVersion;
 use OCA\Files_Versions\Versions\IVersionBackend;
 use OCA\Files_Versions\Versions\Version;
+use OCA\FilesVersionsS3\Command\S3Config;
 use OCP\Files\FileInfo;
+use OCP\Files\ObjectStore\IObjectStore;
 use OCP\IUser;
 
+/**
+ * @psalm-type S3RawVersion = array{Key: string, VersionId: string, LastModified: DateTimeResult, Size: string, isLatest: bool, ETag: string}
+ */
 class S3VersionProvider {
 	/**
 	 * @param S3ConnectionTrait $objectStore
@@ -27,14 +32,15 @@ class S3VersionProvider {
 	 * @return IVersion[]
 	 * @throws \Exception
 	 */
-	public function getVersions($objectStore, string $urn, IUser $user, FileInfo $sourceFile, IVersionBackend $backend) {
+	public function getVersions($objectStore, string $urn, IUser $user, FileInfo $sourceFile, IVersionBackend $backend): array {
 		$client = $objectStore->getConnection();
 		$bucket = $objectStore->getBucket();
+		/** @var array{Versions: array<S3RawVersion>} $result */
 		$result = $client->listObjectVersions([
 			'Bucket' => $bucket,
 			'Prefix' => $urn,
 		]);
-		/** @var list<array{Key: string, VersionId: string, LastModified: DateTimeResult, Size: string, isLatest: bool, ETag: string}> $s3versions */
+		/** @var list<S3RawVersion> $s3versions */
 		$s3versions = array_values($result['Versions'] ?? []);
 		$s3versions = array_filter($s3versions, function (array $version) use ($urn) {
 			return $version['Key'] === $urn;
@@ -43,6 +49,7 @@ class S3VersionProvider {
 			$versionId = $version['VersionId'];
 			$lastModified = $version['LastModified'];
 
+			/** @var array<string, array{Key: string, Value: string}> $tagSet */
 			$tagSet = $client->getObjectTagging([
 				'Bucket' => $bucket,
 				'Key' => $urn,
@@ -98,7 +105,7 @@ class S3VersionProvider {
 	 * @param string $versionId
 	 * @throws \OCP\Files\NotFoundException
 	 */
-	public function rollback($objectStore, string $urn, string $versionId) {
+	public function rollback($objectStore, string $urn, string $versionId): void {
 		$client = $objectStore->getConnection();
 		$bucket = $objectStore->getBucket();
 
@@ -141,16 +148,13 @@ class S3VersionProvider {
 	}
 
 	/**
-	 * @param S3ConnectionTrait $objectStore
-	 * @param string $urn
-	 * @param string $versionId
-	 * @param string $label
 	 * @throws \OCP\Files\NotFoundException
 	 */
-	public function setVersionMetadata($objectStore, string $urn, string $versionId, string $key, string $value) {
+	public function setVersionMetadata(S3ConnectionTrait $objectStore, string $urn, string $versionId, string $key, string $value): void {
 		$client = $objectStore->getConnection();
 		$bucket = $objectStore->getBucket();
 
+		/** @var array<string, array{Key: string, Value: string}> $tagSet */
 		$tagSet = $client->getObjectTagging([
 			'Bucket' => $bucket,
 			'Key' => $urn,
@@ -191,12 +195,9 @@ class S3VersionProvider {
 	}
 
 	/**
-	 * @param S3ConnectionTrait $objectStore
-	 * @param string $urn
-	 * @param string $versionId
 	 * @throws \OCP\Files\NotFoundException
 	 */
-	public function deleteVersion($objectStore, string $urn, string $versionId) {
+	public function deleteVersion(S3ConnectionTrait $objectStore, string $urn, string $versionId): void {
 		$client = $objectStore->getConnection();
 		$bucket = $objectStore->getBucket();
 

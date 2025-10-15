@@ -13,14 +13,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Status extends Base {
-	private $configManager;
-
-	public function __construct(ConfigManager $configManager) {
+	public function __construct(
+		private readonly ConfigManager $configManager,
+	) {
 		parent::__construct();
-		$this->configManager = $configManager;
 	}
 
-	protected function configure() {
+	protected function configure(): void {
 		parent::configure();
 
 		$this
@@ -39,14 +38,14 @@ class Status extends Base {
 				$status[$config->getId()] = [
 					'id' => $config->getId(),
 					'name' => $config->getName(),
-					'enabled' => $config->versioningEnabled(),
+					'enabled' => $config instanceof S3Config && $config->versioningEnabled(),
 				];
 			}
 		} else {
 			foreach ($configs as $config) {
 				if ($config instanceof BrokenConfig) {
 					$status[$config->getId() . ' ("' . $config->getName() . '")'] = '<error>' . $config->getException()->getMessage() . '</error>';
-				} elseif ($config instanceof S3Config) {
+				} else {
 					$status[$config->getId() . ' ("' . $config->getName() . '")'] = $config->versioningEnabled();
 				}
 			}
