@@ -124,6 +124,7 @@ namespace OCA\Files_Versions\Versions {
 		public function rollback(IVersion $version);
 		public function read(IVersion $version);
 		public function getVersionFile(IUser $user, FileInfo $sourceFile, $revision): File;
+		public function getRevision(Node $node): int;
 	}
 
 	interface INameableVersionBackend {

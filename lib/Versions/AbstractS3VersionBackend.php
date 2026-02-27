@@ -24,11 +24,12 @@ use OCP\IUserSession;
 
 abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVersionBackend, IDeletableVersionBackend {
 	public function __construct(
-		private S3VersionProvider $versionProvider,
-		private IUserSession $userSession,
+		private readonly S3VersionProvider $versionProvider,
+		private readonly IUserSession $userSession,
 	) {
 	}
 
+	#[\Override]
 	abstract public function useBackendForStorage(IStorage $storage): bool;
 
 	/**
@@ -39,8 +40,9 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 
 	abstract protected function getUrn(FileInfo $file): string;
 
-	abstract protected function postRollback(FileInfo $file, IVersion $version);
+	abstract protected function postRollback(FileInfo $file, IVersion $version): void;
 
+	#[\Override]
 	public function getVersionsForFile(IUser $user, FileInfo $file): array {
 		$s3 = $this->getS3($file);
 		if ($s3) {
@@ -50,11 +52,13 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 		return [];
 	}
 
+	#[\Override]
 	public function createVersion(IUser $user, FileInfo $file) {
 		// noop, handled by S3
 	}
 
-	public function rollback(IVersion $version) {
+	#[\Override]
+	public function rollback(IVersion $version): bool {
 		if (!$this->currentUserHasPermissions($version->getSourceFile(), \OCP\Constants::PERMISSION_UPDATE)) {
 			throw new Forbidden('You cannot restore this version because you do not have update permissions on the source file.');
 		}
@@ -70,6 +74,7 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 		return false;
 	}
 
+	#[\Override]
 	public function read(IVersion $version) {
 		$source = $version->getSourceFile();
 		$s3 = $this->getS3($source);
@@ -81,6 +86,7 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 		return false;
 	}
 
+	#[\Override]
 	public function getVersionFile(IUser $user, FileInfo $sourceFile, $revision): File {
 		$s3 = $this->getS3($sourceFile);
 		if ($s3) {
@@ -102,6 +108,7 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 		throw new \Exception('Requested s3 version for a file not stored in s3');
 	}
 
+	#[\Override]
 	public function deleteVersion(IVersion $version): void {
 		if (!$this->currentUserHasPermissions($version->getSourceFile(), \OCP\Constants::PERMISSION_DELETE)) {
 			throw new Forbidden('You cannot delete this version because you do not have delete permissions on the source file.');
@@ -114,6 +121,7 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 		}
 	}
 
+	#[\Override]
 	public function setMetadataValue(Node $node, int $revision, string $key, string $value): void {
 		if (!$this->currentUserHasPermissions($node, \OCP\Constants::PERMISSION_UPDATE)) {
 			throw new Forbidden('You cannot update the version\'s metadata because you do not have update permissions on the source file.');
@@ -138,6 +146,7 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 		return ($sourceFile->getPermissions() & $permissions) === $permissions;
 	}
 
+	#[\Override]
 	public function getRevision(Node $node): int {
 		return $node->getMTime();
 	}

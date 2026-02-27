@@ -11,16 +11,12 @@ namespace OCA\FilesVersionsS3\Command;
 use Exception;
 
 class BrokenConfig {
-	private $id;
-	private $bucket;
-	private $name;
-	private $exception;
-
-	public function __construct(string $id, string $bucket, string $name, Exception $exception) {
-		$this->id = $id;
-		$this->bucket = $bucket;
-		$this->name = $name;
-		$this->exception = $exception;
+	public function __construct(
+		private readonly string $id,
+		private readonly string $bucket,
+		private readonly string $name,
+		private readonly Exception $exception,
+	) {
 	}
 
 	public function getId(): string {

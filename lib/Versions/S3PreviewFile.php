@@ -26,9 +26,9 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 	 * @param callable $contentProvider
 	 */
 	public function __construct(
-		private FileInfo $sourceFile,
+		private readonly FileInfo $sourceFile,
 		private $contentProvider,
-		private IVersion $version,
+		private readonly IVersion $version,
 	) {
 	}
 

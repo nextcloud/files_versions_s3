@@ -14,14 +14,14 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Enable extends Base {
-	private $configManager;
-
-	public function __construct(ConfigManager $configManager) {
+	public function __construct(
+		private readonly ConfigManager $configManager,
+	) {
 		parent::__construct();
-		$this->configManager = $configManager;
 	}
 
-	protected function configure() {
+	#[\Override]
+	protected function configure(): void {
 		parent::configure();
 
 		$this
@@ -30,6 +30,7 @@ class Enable extends Base {
 			->addArgument('id', InputArgument::REQUIRED, 'Id of the s3 configuration to enable versioning for');
 	}
 
+	#[\Override]
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$configs = $this->configManager->getS3Configs();
 
