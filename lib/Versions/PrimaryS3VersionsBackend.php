@@ -10,12 +10,12 @@ namespace OCA\FilesVersionsS3\Versions;
 
 use OC\Files\ObjectStore\ObjectStoreStorage;
 use OC\Files\ObjectStore\S3;
-use OC\Files\ObjectStore\S3ConnectionTrait;
 use OCA\Files_Versions\Versions\IVersion;
 use OCP\Files\FileInfo;
 use OCP\Files\Storage\IStorage;
 
 class PrimaryS3VersionsBackend extends AbstractS3VersionBackend {
+	#[\Override]
 	public function useBackendForStorage(IStorage $storage): bool {
 		if ($storage->instanceOfStorage(ObjectStoreStorage::class)) {
 			/** @var ObjectStoreStorage $storage */
@@ -25,11 +25,8 @@ class PrimaryS3VersionsBackend extends AbstractS3VersionBackend {
 		return false;
 	}
 
-	/**
-	 * @param FileInfo $file
-	 * @return S3ConnectionTrait|null
-	 */
-	protected function getS3(FileInfo $file) {
+	#[\Override]
+	protected function getS3(FileInfo $file): ?S3 {
 		$storage = $file->getStorage();
 		if ($storage->instanceOfStorage(ObjectStoreStorage::class)) {
 			/** @var ObjectStoreStorage $storage */
@@ -42,13 +39,15 @@ class PrimaryS3VersionsBackend extends AbstractS3VersionBackend {
 		return null;
 	}
 
+	#[\Override]
 	protected function getUrn(FileInfo $file): string {
 		/** @var ObjectStoreStorage $storage */
 		$storage = $file->getStorage();
 		return $storage->getURN($file->getId());
 	}
 
-	protected function postRollback(FileInfo $file, IVersion $version) {
+	#[\Override]
+	protected function postRollback(FileInfo $file, IVersion $version): void {
 		$cache = $file->getStorage()->getCache();
 		$cache->update($file->getId(), [
 			'mtime' => time(),

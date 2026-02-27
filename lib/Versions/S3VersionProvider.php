@@ -79,7 +79,7 @@ class S3VersionProvider {
 				$sourceFile->getName(),
 				(int)$version['Size'],
 				$sourceFile->getMimetype(),
-				$sourceFile->getId() . '/' . $lastModified->format('c'),
+				((string)$sourceFile->getId()) . '/' . $lastModified->format('c'),
 				$sourceFile,
 				$backend,
 				$user,

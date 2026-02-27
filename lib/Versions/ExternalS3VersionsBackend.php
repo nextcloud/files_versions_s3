@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace OCA\FilesVersionsS3\Versions;
 
-use OC\Files\ObjectStore\S3ConnectionTrait;
 use OC\Files\Storage\Wrapper\Jail;
 use OCA\Files_External\Lib\Storage\AmazonS3;
 use OCA\Files_Versions\Versions\IVersion;
@@ -16,15 +15,13 @@ use OCP\Files\FileInfo;
 use OCP\Files\Storage\IStorage;
 
 class ExternalS3VersionsBackend extends AbstractS3VersionBackend {
+	#[\Override]
 	public function useBackendForStorage(IStorage $storage): bool {
 		return true;
 	}
 
-	/**
-	 * @param FileInfo $file
-	 * @return S3ConnectionTrait|null
-	 */
-	protected function getS3(FileInfo $file) {
+	#[\Override]
+	protected function getS3(FileInfo $file): ?AmazonS3 {
 		$storage = $file->getStorage();
 		if ($storage->instanceOfStorage(AmazonS3::class)) {
 			/** @var AmazonS3 $storage */
@@ -34,6 +31,7 @@ class ExternalS3VersionsBackend extends AbstractS3VersionBackend {
 		}
 	}
 
+	#[\Override]
 	protected function getUrn(FileInfo $file): string {
 		$storage = $file->getStorage();
 		$path = $file->getInternalPath();
@@ -45,7 +43,8 @@ class ExternalS3VersionsBackend extends AbstractS3VersionBackend {
 		return $path;
 	}
 
-	protected function postRollback(FileInfo $file, IVersion $version) {
+	#[\Override]
+	protected function postRollback(FileInfo $file, IVersion $version): void {
 		$file->getStorage()->getUpdater()->update($file->getInternalPath());
 	}
 }
