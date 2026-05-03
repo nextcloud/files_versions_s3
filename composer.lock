@@ -1219,12 +1219,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nextcloud-deps/ocp.git",
-                "reference": "071dfa79bf887f5515b5fb0b0d8a2e014cd54404"
+                "reference": "54c7a351d557960075f64014d4bfa451e86f3236"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/071dfa79bf887f5515b5fb0b0d8a2e014cd54404",
-                "reference": "071dfa79bf887f5515b5fb0b0d8a2e014cd54404",
+                "url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/54c7a351d557960075f64014d4bfa451e86f3236",
+                "reference": "54c7a351d557960075f64014d4bfa451e86f3236",
                 "shasum": ""
             },
             "require": {
@@ -1255,7 +1255,7 @@
                 "issues": "https://github.com/nextcloud-deps/ocp/issues",
                 "source": "https://github.com/nextcloud-deps/ocp/tree/stable29"
             },
-            "time": "2025-02-22T00:42:32+00:00"
+            "time": "2026-04-28T01:53:23+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -3808,5 +3808,5 @@
     "prefer-lowest": false,
     "platform": {},
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
