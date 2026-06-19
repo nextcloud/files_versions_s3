@@ -8,15 +8,17 @@ declare(strict_types=1);
 
 namespace OCA\FilesVersionsS3\Versions;
 
-use OC\Files\ObjectStore\S3ConnectionTrait;
+use OC\Files\Node\Node;
+use OC\Files\ObjectStore\S3;
 use OCA\DAV\Connector\Sabre\Exception\Forbidden;
+use OCA\Files_External\Lib\Storage\AmazonS3;
 use OCA\Files_Versions\Versions\IDeletableVersionBackend;
 use OCA\Files_Versions\Versions\IMetadataVersionBackend;
 use OCA\Files_Versions\Versions\IVersion;
 use OCA\Files_Versions\Versions\IVersionBackend;
 use OCP\Files\File;
 use OCP\Files\FileInfo;
-use OCP\Files\Node;
+use OCP\Files\Node as INode;
 use OCP\Files\NotFoundException;
 use OCP\Files\Storage\IStorage;
 use OCP\IUser;
@@ -34,7 +36,7 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 
 	/**
 	 * @param FileInfo $file
-	 * @return S3ConnectionTrait|null
+	 * @return S3|AmazonS3|null
 	 */
 	abstract protected function getS3(FileInfo $file);
 
@@ -102,7 +104,7 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 			}
 
 			return new S3PreviewFile($sourceFile, function () use ($s3, $sourceFile, $revision) {
-				return $this->versionProvider->read($s3, $this->getUrn($sourceFile), $revision);
+				return $this->versionProvider->read($s3, $this->getUrn($sourceFile), (string)$revision);
 			}, $revisionVersion);
 		}
 		throw new \Exception('Requested s3 version for a file not stored in s3');
@@ -122,7 +124,7 @@ abstract class AbstractS3VersionBackend implements IVersionBackend, IMetadataVer
 	}
 
 	#[\Override]
-	public function setMetadataValue(Node $node, int $revision, string $key, string $value): void {
+	public function setMetadataValue(INode $node, int $revision, string $key, string $value): void {
 		if (!$this->currentUserHasPermissions($node, \OCP\Constants::PERMISSION_UPDATE)) {
 			throw new Forbidden('You cannot update the version\'s metadata because you do not have update permissions on the source file.');
 		}
