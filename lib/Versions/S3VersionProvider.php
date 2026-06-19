@@ -35,10 +35,10 @@ class S3VersionProvider {
 			'Bucket' => $bucket,
 			'Prefix' => $urn,
 		]);
-		/** @var list<array{Key: string, VersionId: string, LastModified: DateTimeResult, Size: string, isLatest: bool, ETag: string}> $s3versions */
+		/** @var list<array{Key: string, VersionId: string, LastModified: DateTimeResult, Size: string, IsLatest: bool, ETag: string}> $s3versions */
 		$s3versions = array_values($result['Versions'] ?? []);
 		$s3versions = array_filter($s3versions, function (array $version) use ($urn) {
-			return $version['Key'] === $urn;
+			return !$version['IsLatest'] && $version['Key'] === $urn;
 		});
 		$versions = array_map(function (array $version) use ($client, $bucket, $urn, $user, $sourceFile, $backend) {
 			$versionId = $version['VersionId'];
