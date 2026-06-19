@@ -8,7 +8,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns="https://getpsalm.org/schema/config"
 	xsi:schemaLocation="https://getpsalm.org/schema/config"
-	phpVersion="8.1"
+	phpVersion="8.2"
 	findUnusedCode="false"
     errorBaseline="psalm-baseline.xml"
 >
@@ -19,7 +19,33 @@
 		<directory name="vendor/nextcloud/ocp"/>
 	</extraFiles>
 	<stubs>
-		<file name="tests/stubs/stub.phpstub" preloadClasses="true"/>
+		<file name="tests/stubs/oc_core_command_base.php" preloadClasses="true"/>
+		<file name="tests/stubs/oc_hooks_emitter.php" preloadClasses="true"/>
+		<file name="tests/stubs/oc_files_objectstore_objectstorestorage.php" preloadClasses="true"/>
+		<file name="tests/stubs/oc_files_objectstore_s3connectiontrait.php" preloadClasses="true"/>
+		<file name="tests/stubs/oc_files_objectstore_s3.php" preloadClasses="true"/>
+		<file name="tests/stubs/oc_files_storage_common.php" preloadClasses="true"/>
+		<file name="tests/stubs/oc_files_storage_storage.php" preloadClasses="true"/>
+		<file name="tests/stubs/oc_files_storage_wrapper_jail.php" preloadClasses="true"/>
+		<file name="tests/stubs/oc_files_storage_wrapper_wrapper.php" preloadClasses="true"/>
+		<file name="tests/stubs/oc_files_node_node.php" preloadClasses="true"/>
+		<file name="tests/stubs/oca_dav_connector_sabre_exception_forbidden.php" preloadClasses="true"/>
+		<file name="tests/stubs/oca_files_external_service_storagesservice.php" preloadClasses="true"/>
+		<file name="tests/stubs/oca_files_external_service_globalstoragesservice.php" preloadClasses="true"/>
+		<file name="tests/stubs/oca_files_external_lib_backend_amazons3.php" preloadClasses="true"/>
+		<file name="tests/stubs/oca_files_external_lib_backend_backend.php" preloadClasses="true"/>
+		<file name="tests/stubs/oca_files_external_lib_storageconfig.php" preloadClasses="true"/>
+		<file name="tests/stubs/oca_files_external_lib_storage_amazons3.php" preloadClasses="true"/>
+		<file name="tests/stubs/oca_files_external_lib_iidentifier.php" preloadClasses="true"/>
+		<file name="tests/stubs/oca_files_external_lib_ifrontenddefinition.php" preloadClasses="true"/>
+		<file name="tests/stubs/oca_files_versions_versions_iversionbackend.php" preloadClasses="true" />
+		<file name="tests/stubs/oca_files_versions_versions_inameableversionbackend.php" preloadClasses="true" />
+		<file name="tests/stubs/oca_files_versions_versions_ideletableversionbackend.php" preloadClasses="true" />
+		<file name="tests/stubs/oca_files_versions_versions_imetadataversionbackend.php" preloadClasses="true" />
+		<file name="tests/stubs/oca_files_versions_versions_imetadataversion.php" preloadClasses="true" />
+		<file name="tests/stubs/oca_files_versions_versions_iversion.php" preloadClasses="true" />
+		<file name="tests/stubs/oca_files_versions_versions_version.php" preloadClasses="true" />
+		<file name="tests/stubs/stecman_component_symfony_console_bashcompletion_completion_completionawareinterface.php" preloadClasses="true" />
 	</stubs>
 	<issueHandlers>
 	</issueHandlers>
