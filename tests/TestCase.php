@@ -8,7 +8,9 @@ declare(strict_types=1);
 
 namespace OCA\FilesVersionsS3\Tests;
 
+use OCP\IConfig;
 use OCP\IDBConnection;
+use OCP\Server;
 
 abstract class TestCase extends \Test\TestCase {
 	public static function tearDownAfterClass(): void {
@@ -19,7 +21,7 @@ abstract class TestCase extends \Test\TestCase {
 				return self::$realDatabase;
 			});
 		}
-		$dataDir = \OC::$server->getConfig()->getSystemValue('datadirectory', \OC::$SERVERROOT . '/data-autotest');
+		$dataDir = Server::get(IConfig::class)->getSystemValue('datadirectory', \OC::$SERVERROOT . '/data-autotest');
 
 		self::tearDownAfterClassCleanStrayDataFiles($dataDir);
 		self::tearDownAfterClassCleanStrayHooks();

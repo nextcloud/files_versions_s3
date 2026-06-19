@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace OCA\FilesVersionsS3\Versions;
 
 use OCA\Files_Versions\Versions\IVersion;
+use OCP\Files\Cache\ICacheEntry;
 use OCP\Files\File;
 use OCP\Files\FileInfo;
 use OCP\Files\Folder;
@@ -118,7 +119,7 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 
 	#[Override]
 	public function getPreviewVersion(): string {
-		return $this->version->getRevisionId();
+		return (string)$this->version->getRevisionId();
 	}
 
 	#[Override]
@@ -176,7 +177,7 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 
 	#[Override]
 	public function getEtag(): string {
-		return $this->version->getRevisionId();
+		return (string)$this->version->getRevisionId();
 	}
 
 	#[Override]
@@ -251,5 +252,16 @@ class S3PreviewFile implements File, IVersionedPreviewFile {
 	#[Override]
 	public function getMetadata(): array {
 		return [];
+	}
+
+	#[Override]
+	public function getData(): ICacheEntry {
+		/** @psalm-suppress UndefinedInterfaceMethod */
+		return $this->sourceFile->getData();
+	}
+
+	#[Override]
+	public function getLastActivity(): int {
+		return max($this->getUploadTime(), $this->getMTime());
 	}
 }

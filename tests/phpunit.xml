@@ -10,6 +10,7 @@
 >
 	<testsuite name='Nextcloud - S3 versioning App Tests'>
 		<directory suffix='.php'>.</directory>
+		<exclude>./stubs/</exclude>
 	</testsuite>
 	<filter>
 		<whitelist>

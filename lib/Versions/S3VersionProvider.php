@@ -10,7 +10,8 @@ namespace OCA\FilesVersionsS3\Versions;
 
 use Aws\Api\DateTimeResult;
 use Aws\S3\S3Client;
-use OC\Files\ObjectStore\S3ConnectionTrait;
+use OC\Files\ObjectStore\S3;
+use OCA\Files_External\Lib\Storage\AmazonS3;
 use OCA\Files_Versions\Versions\IVersion;
 use OCA\Files_Versions\Versions\IVersionBackend;
 use OCA\Files_Versions\Versions\Version;
@@ -19,7 +20,7 @@ use OCP\IUser;
 
 class S3VersionProvider {
 	/**
-	 * @param S3ConnectionTrait $objectStore
+	 * @param S3|AmazonS3 $objectStore
 	 * @param string $urn
 	 * @param IUser $user
 	 * @param FileInfo $sourceFile
@@ -34,10 +35,10 @@ class S3VersionProvider {
 			'Bucket' => $bucket,
 			'Prefix' => $urn,
 		]);
-		/** @var list<array{Key: string, VersionId: string, LastModified: DateTimeResult, Size: string, isLatest: bool, ETag: string}> $s3versions */
+		/** @var list<array{Key: string, VersionId: string, LastModified: DateTimeResult, Size: string, IsLatest: bool, ETag: string}> $s3versions */
 		$s3versions = array_values($result['Versions'] ?? []);
 		$s3versions = array_filter($s3versions, function (array $version) use ($urn) {
-			return $version['Key'] === $urn;
+			return !$version['IsLatest'] && $version['Key'] === $urn;
 		});
 		$versions = array_map(function (array $version) use ($client, $bucket, $urn, $user, $sourceFile, $backend) {
 			$versionId = $version['VersionId'];
@@ -93,7 +94,7 @@ class S3VersionProvider {
 	}
 
 	/**
-	 * @param S3ConnectionTrait $objectStore
+	 * @param S3|AmazonS3 $objectStore
 	 * @param string $urn
 	 * @param string $versionId
 	 * @throws \OCP\Files\NotFoundException
@@ -110,10 +111,10 @@ class S3VersionProvider {
 	}
 
 	/**
-	 * @param S3ConnectionTrait $objectStore
+	 * @param S3|AmazonS3 $objectStore
 	 * @param string $urn
 	 * @param string $versionId
-	 * @return bool|resource
+	 * @return false|resource
 	 * @throws \OCP\Files\NotFoundException
 	 */
 	public function read($objectStore, string $urn, string $versionId) {
@@ -141,7 +142,7 @@ class S3VersionProvider {
 	}
 
 	/**
-	 * @param S3ConnectionTrait $objectStore
+	 * @param S3|AmazonS3 $objectStore
 	 * @param string $urn
 	 * @param string $versionId
 	 * @param string $label
@@ -191,7 +192,7 @@ class S3VersionProvider {
 	}
 
 	/**
-	 * @param S3ConnectionTrait $objectStore
+	 * @param S3|AmazonS3 $objectStore
 	 * @param string $urn
 	 * @param string $versionId
 	 * @throws \OCP\Files\NotFoundException
