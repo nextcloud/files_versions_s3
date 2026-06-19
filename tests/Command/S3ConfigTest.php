@@ -10,6 +10,7 @@ namespace OCA\FilesVersionsS3\Tests\Command;
 use OCA\FilesVersionsS3\Command\ConfigManager;
 use OCA\FilesVersionsS3\Command\S3Config;
 use OCA\FilesVersionsS3\Tests\TestCase;
+use OCP\Server;
 
 /**
  * @group DB
@@ -22,7 +23,7 @@ class S3ConfigTest extends TestCase {
 		parent::setUp();
 
 		/** @var ConfigManager $configManager */
-		$configManager = \OC::$server->query(ConfigManager::class);
+		$configManager = Server::get(ConfigManager::class);
 		$configs = $configManager->getS3Configs();
 		$configs = array_filter($configs, function ($config) {
 			return $config instanceof S3Config;

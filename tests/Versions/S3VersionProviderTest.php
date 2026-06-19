@@ -16,6 +16,7 @@ use OCA\FilesVersionsS3\Tests\TestCase;
 use OCA\FilesVersionsS3\Versions\S3VersionProvider;
 use OCP\Files\FileInfo;
 use OCP\IUser;
+use OCP\Server;
 
 /**
  * @group DB
@@ -34,7 +35,7 @@ class S3VersionProviderTest extends TestCase {
 		parent::setUp();
 
 		/** @var ConfigManager $configManager */
-		$configManager = \OC::$server->query(ConfigManager::class);
+		$configManager = Server::get(ConfigManager::class);
 		$configs = $configManager->getS3Configs();
 		$configs = array_filter($configs, function ($config) {
 			return $config instanceof S3Config;
@@ -42,7 +43,6 @@ class S3VersionProviderTest extends TestCase {
 
 		if (!$configs) {
 			$this->markTestSkipped('No S3 configured');
-			return;
 		}
 		$this->config = current($configs);
 		$this->versionProvider = new S3VersionProvider();
@@ -168,7 +168,7 @@ class S3VersionProviderTest extends TestCase {
 			$this->backend
 		);
 
-		$this->assertEquals('', $versions[1]->getLabel());
+		$this->assertEquals('', $versions[1]->getMetadataValue('label'));
 
 		$this->versionProvider->setVersionMetadata($this->config, 'labeling', $versions[1]->getRevisionId(), 'label', 'label');
 
@@ -181,7 +181,7 @@ class S3VersionProviderTest extends TestCase {
 			$this->backend
 		);
 
-		$this->assertEquals('label', $versions[1]->getLabel());
+		$this->assertEquals('label', $versions[1]->getMetadataValue('label'));
 
 		$this->versionProvider->setVersionMetadata($this->config, 'labeling', $versions[1]->getRevisionId(), 'label', '');
 
@@ -194,7 +194,7 @@ class S3VersionProviderTest extends TestCase {
 			$this->backend
 		);
 
-		$this->assertEquals('', $versions[1]->getLabel());
+		$this->assertEquals('', $versions[1]->getMetadataValue('label'));
 	}
 
 	public function testDeleteVersion() {
