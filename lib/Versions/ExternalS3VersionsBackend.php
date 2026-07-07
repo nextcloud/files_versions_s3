@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace OCA\FilesVersionsS3\Versions;
 
 use OC\Files\Storage\Wrapper\Jail;
+use OC\Files\Storage\Wrapper\Wrapper;
 use OCA\Files_External\Lib\Storage\AmazonS3;
 use OCA\Files_Versions\Versions\IVersion;
 use OCP\Files\FileInfo;
@@ -23,7 +24,17 @@ class ExternalS3VersionsBackend extends AbstractS3VersionBackend {
 	#[\Override]
 	protected function getS3(FileInfo $file): ?AmazonS3 {
 		$storage = $file->getStorage();
+
 		if ($storage->instanceOfStorage(AmazonS3::class)) {
+			// Try to directly get the instance in case the storage is a wrapper
+			if ($storage->instanceOfStorage(Wrapper::class)) {
+				/**
+				 * psalm doesn't know that we already checked this
+				 * @psalm-suppress UndefinedMethod
+				 */
+				return $storage->getInstanceOfStorage(AmazonS3::class);
+			}
+
 			/** @var AmazonS3 $storage */
 			return $storage;
 		} else {
